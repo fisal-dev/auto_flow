@@ -8,6 +8,8 @@ export default defineConfig({
     port: 8080,
   },
   build: {
+    outDir: '../dist',
+    emptyOutDir: true,
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
