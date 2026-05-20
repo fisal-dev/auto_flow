@@ -11,8 +11,21 @@ const app = express();
 connectDB();
 
 // CORS Settings
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:8080',
+  'http://localhost:5173',
+].filter(Boolean);
+
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
   credentials: true
 }));
 
