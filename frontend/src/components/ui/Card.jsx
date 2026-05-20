@@ -29,7 +29,7 @@ const Card = ({
       className={`
         ${variants[variant] || variants.default}
         ${noPadding ? "" : "p-6"}
-        ${glowingBorder ? "glow-border shadow-[0_0_30px_rgba(99,102,241,0.12)]" : ""}
+        ${glowingBorder ? "glow-border shadow-[0_0_30px_rgba(var(--accent-rgb),0.12)]" : ""}
         ${onClick ? "cursor-pointer" : ""}
         ${className}
       `}

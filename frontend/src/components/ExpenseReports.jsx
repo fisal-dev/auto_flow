@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { ReceiptText, Filter, Search, DollarSign, CalendarClock, Car, ArrowDownToLine } from "lucide-react";
+import { ReceiptText, Filter, Search, IndianRupee, CalendarClock, Car, ArrowDownToLine } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 
 const ExpenseReports = () => {
   const [expenses] = useState([
-    { id: 1, vehicle: "Toyota Corolla", date: "Feb 01, 2024", category: "Oil Change", cost: 50 },
-    { id: 2, vehicle: "Honda Civic", date: "Feb 05, 2024", category: "Tire Replacement", cost: 200 },
-    { id: 3, vehicle: "Ford F-150", date: "Feb 08, 2024", category: "Brake Service", cost: 300 },
-    { id: 4, vehicle: "Tesla Model 3", date: "Feb 10, 2024", category: "Detailing", cost: 120 },
+    { id: 1, vehicle: "Tata Nexon", date: "Feb 01, 2024", category: "Oil Change", cost: 4200 },
+    { id: 2, vehicle: "Maruti Suzuki Swift", date: "Feb 05, 2024", category: "Tire Replacement", cost: 12500 },
+    { id: 3, vehicle: "Mahindra Thar", date: "Feb 08, 2024", category: "Brake Service", cost: 15000 },
+    { id: 4, vehicle: "Hyundai Creta", date: "Feb 10, 2024", category: "Detailing", cost: 3500 },
   ]);
   
   const [filters, setFilters] = useState({ vehicle: "", category: "", startDate: "", endDate: "" });
@@ -42,10 +42,10 @@ const ExpenseReports = () => {
           </div>
 
           <div className="flex gap-4 items-center">
-            <div className="px-5 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center gap-3 shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+            <div className="px-5 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center gap-3 shadow-[0_0_20px_rgba(var(--accent-rgb),0.1)]">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Filtered:</span>
-              <span className="text-xl font-extrabold text-white flex items-center">
-                <span className="text-indigo-400 mr-0.5">$</span>{totalCost}
+              <span className="text-xl font-extrabold text-foreground flex items-center">
+                <span className="text-indigo-400 mr-0.5">₹</span>{totalCost}
               </span>
             </div>
             <Button variant="secondary" icon={ArrowDownToLine}>
@@ -55,7 +55,7 @@ const ExpenseReports = () => {
         </div>
 
         {/* Filters Form Card */}
-        <Card variant="bordered" className="p-6 bg-[#0D1424]/80">
+        <Card variant="bordered" className="p-6 bg-surface/80">
           <div className="flex items-center gap-2 text-indigo-400 font-bold mb-4 uppercase tracking-widest text-xs">
             <Filter className="w-4 h-4" /> Filter Parameters
           </div>
@@ -108,9 +108,9 @@ const ExpenseReports = () => {
         </Card>
 
         {/* Expenses List Card */}
-        <Card variant="bordered" className="p-0 overflow-hidden bg-[#0D1424]/80">
+        <Card variant="bordered" className="p-0 overflow-hidden bg-surface/80">
           <div className="p-6 border-b border-white/5">
-            <h2 className="text-lg font-extrabold text-white">Expenditure Log</h2>
+            <h2 className="text-lg font-extrabold text-foreground">Expenditure Log</h2>
           </div>
 
           {filteredExpenses.length === 0 ? (
@@ -132,11 +132,13 @@ const ExpenseReports = () => {
                 <tbody>
                   {filteredExpenses.map((expense) => (
                     <tr key={expense.id}>
-                      <td className="pl-6 font-bold text-white flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
-                          <Car className="w-3 h-3 text-slate-400" />
+                      <td className="pl-6">
+                        <div className="font-bold text-foreground flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+                            <Car className="w-3 h-3 text-slate-400" />
+                          </div>
+                          {expense.vehicle}
                         </div>
-                        {expense.vehicle}
                       </td>
                       <td className="font-semibold text-slate-300">{expense.category}</td>
                       <td className="text-slate-400">
@@ -146,7 +148,7 @@ const ExpenseReports = () => {
                         </span>
                       </td>
                       <td className="pr-6 font-extrabold text-emerald-400">
-                        ${expense.cost}
+                        ₹{expense.cost}
                       </td>
                     </tr>
                   ))}

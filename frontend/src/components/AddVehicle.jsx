@@ -46,7 +46,7 @@ const AddVehicle = () => {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-extrabold text-white">Add New Vehicle</h1>
+              <h1 className="text-2xl font-extrabold text-foreground">Add New Vehicle</h1>
               <p className="text-sm text-slate-400">Register a new asset into your fleet</p>
             </div>
           </div>
@@ -60,7 +60,7 @@ const AddVehicle = () => {
           {[1, 2, 3].map((s) => (
             <div key={s} className="relative z-10 flex flex-col items-center gap-2">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
-                step >= s ? "bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]" : "bg-[#0D1424] border-2 border-white/10 text-slate-500"
+                step >= s ? "bg-indigo-500 text-white shadow-[0_0_15px_rgba(var(--accent-rgb),0.4)]" : "bg-surface border-2 border-white/10 text-slate-500"
               }`}>
                 {s === 3 && step === 3 ? <CheckCircle2 className="w-5 h-5" /> : s}
               </div>
@@ -72,13 +72,13 @@ const AddVehicle = () => {
         </div>
 
         {/* Form Card */}
-        <Card variant="bordered" className="bg-[#0D1424]/80 p-8 sm:p-12 relative overflow-hidden">
+        <Card variant="bordered" className="bg-surface/80 p-8 sm:p-12 relative overflow-hidden">
           {/* Subtle glow */}
           <div className="absolute -top-32 -right-32 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none" />
 
           {step === 1 && (
             <div className="animate-slide-left">
-              <h2 className="text-xl font-bold text-white mb-6">Vehicle Details</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Vehicle Details</h2>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -93,7 +93,7 @@ const AddVehicle = () => {
                         value={vehicle.make}
                         onChange={handleChange}
                         className="input-field pl-11"
-                        placeholder="e.g. Toyota"
+                        placeholder="e.g. Tata"
                       />
                     </div>
                   </div>
@@ -109,7 +109,7 @@ const AddVehicle = () => {
                         value={vehicle.model}
                         onChange={handleChange}
                         className="input-field pl-11"
-                        placeholder="e.g. Camry"
+                        placeholder="e.g. Nexon"
                       />
                     </div>
                   </div>
@@ -142,7 +142,7 @@ const AddVehicle = () => {
 
           {step === 2 && (
             <div className="animate-slide-left">
-              <h2 className="text-xl font-bold text-white mb-6">Identifiers</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Identifiers</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">VIN (Vehicle Identification Number)</label>
@@ -156,7 +156,7 @@ const AddVehicle = () => {
                       value={vehicle.vin}
                       onChange={handleChange}
                       className="input-field pl-11 uppercase font-mono"
-                      placeholder="1HGCM82633A123456"
+                      placeholder="MAT543210NJ123456"
                       required
                     />
                   </div>
@@ -174,7 +174,7 @@ const AddVehicle = () => {
                       value={vehicle.registrationNumber}
                       onChange={handleChange}
                       className="input-field pl-11 uppercase font-mono"
-                      placeholder="ABC-1234"
+                      placeholder="MH-12-AB-1234"
                       required
                     />
                   </div>
@@ -197,7 +197,7 @@ const AddVehicle = () => {
               <div className="mx-auto w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mb-6 glow-emerald">
                 <CheckCircle2 className="w-10 h-10 text-emerald-400" />
               </div>
-              <h2 className="text-3xl font-extrabold text-white mb-3">Vehicle Added</h2>
+              <h2 className="text-3xl font-extrabold text-foreground mb-3">Vehicle Added</h2>
               <p className="text-slate-400 mb-8 max-w-sm mx-auto">
                 {vehicle.make} {vehicle.model} has been successfully registered to your fleet.
               </p>

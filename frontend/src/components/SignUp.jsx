@@ -44,24 +44,24 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080C14] flex">
+    <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
       {/* Left Branding Panel (Hidden on Mobile) */}
-      <div className="hidden lg:flex w-1/2 bg-[#0D1424] relative overflow-hidden flex-col justify-between p-12 border-r border-white/5">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0D1424] to-[#080C14] pointer-events-none"></div>
-        
+      <div className="hidden lg:flex w-1/2 bg-surface relative overflow-hidden flex-col justify-between p-12 border-r border-white/5 transition-colors duration-300">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-indigo-900/20 via-surface to-background pointer-events-none"></div>
+
         <Link to="/" className="relative z-10 flex items-center gap-2.5 group w-max">
-          <div className="p-2 rounded-xl bg-indigo-500/15 border border-indigo-500/25">
-            <Car className="w-5 h-5 text-indigo-400" />
+          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center border border-indigo-500/20 group-hover:border-indigo-500/40 transition-all duration-200 shadow-[0_0_15px_rgba(var(--accent-rgb),0.15)] bg-background">
+            <img src="/autoflow_logo.png" alt="AutoFlow Logo" className="w-full h-full object-cover scale-[1.15]" />
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">
+          <span className="text-xl font-bold text-foreground tracking-tight">
             Auto<span className="text-indigo-400">Flow</span>
           </span>
         </Link>
 
         <div className="relative z-10 max-w-md">
           <ShieldCheck className="w-12 h-12 text-emerald-400 mb-6 opacity-80" />
-          <h2 className="text-4xl font-extrabold text-white leading-tight mb-4 tracking-tight">
-            Join the new standard <br/> in fleet management.
+          <h2 className="text-4xl font-extrabold text-foreground leading-tight mb-4 tracking-tight">
+            Join the new standard <br /> in fleet management.
           </h2>
           <ul className="space-y-4 mt-8">
             {[
@@ -69,12 +69,12 @@ const SignUp = () => {
               "Automated maintenance forecasting",
               "Comprehensive expense analytics"
             ].map((feature, i) => (
-               <li key={i} className="flex items-center gap-3 text-slate-300 font-medium">
-                 <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400">
-                    <Check className="w-3.5 h-3.5" />
-                 </div>
-                 {feature}
-               </li>
+              <li key={i} className="flex items-center gap-3 text-slate-300 font-medium">
+                <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400">
+                  <Check className="w-3.5 h-3.5" />
+                </div>
+                {feature}
+              </li>
             ))}
           </ul>
         </div>
@@ -89,26 +89,26 @@ const SignUp = () => {
       {/* Right Sign Up Panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative overflow-y-auto">
         <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-        
+
         <div className="w-full max-w-[420px] relative z-10 py-12">
-          
+
           <div className="lg:hidden flex items-center justify-center gap-2.5 mb-10">
-            <div className="p-1.5 rounded-lg bg-indigo-500/15 border border-indigo-500/25">
-              <Car className="w-5 h-5 text-indigo-400" />
+            <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center border border-indigo-500/20 shadow-[0_0_15px_rgba(var(--accent-rgb),0.15)] bg-background">
+              <img src="/autoflow_logo.png" alt="AutoFlow Logo" className="w-full h-full object-cover scale-[1.15]" />
             </div>
-            <span className="text-2xl font-bold text-white tracking-tight">
+            <span className="text-2xl font-bold text-foreground tracking-tight">
               Auto<span className="text-indigo-400">Flow</span>
             </span>
           </div>
 
           <div className="mb-10 text-center lg:text-left">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Create Account</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground mb-2">Create Account</h1>
             <p className="text-slate-400 text-sm">Step 1 of 1: Configure your access credentials</p>
           </div>
 
-          <Card variant="bordered" className="p-8 sm:p-10 bg-[#0D1424]/80 backdrop-blur-xl">
+          <Card variant="bordered" className="p-8 sm:p-10 bg-surface/80 backdrop-blur-xl">
             <form onSubmit={handleSignUp} className="space-y-6">
-              
+
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
                 <div className="relative group">
@@ -142,9 +142,9 @@ const SignUp = () => {
                   />
                 </div>
                 {password && (
-                   <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
-                     <div className={`h-full ${getStrengthColor()} transition-all duration-300`} style={{ width: `${strength}%` }}></div>
-                   </div>
+                  <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+                    <div className={`h-full ${getStrengthColor()} transition-all duration-300`} style={{ width: `${strength}%` }}></div>
+                  </div>
                 )}
               </div>
 

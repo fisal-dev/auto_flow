@@ -24,7 +24,7 @@ const HomePage = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 glass-card border border-indigo-500/30 text-indigo-300 rounded-full text-sm font-semibold mb-8 shadow-[0_0_20px_rgba(99,102,241,0.15)]"
+            className="inline-flex items-center gap-2 px-4 py-1.5 glass-card border border-indigo-500/30 text-indigo-300 rounded-full text-sm font-semibold mb-8 shadow-[0_0_20px_rgba(var(--accent-rgb),0.15)]"
           >
             <Activity className="w-4 h-4" /> Next-Gen Fleet Intelligence
           </motion.div>
@@ -65,7 +65,7 @@ const HomePage = () => {
         >
           <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400"/> 10k+ Vehicles Tracked</div>
           <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-400"/> 99.9% Uptime</div>
-          <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-amber-400"/> $2M+ Maintenance Saved</div>
+          <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-amber-400"/> ₹15 Crore+ Maintenance Saved</div>
         </motion.div>
       </div>
 
@@ -144,7 +144,7 @@ const HomePage = () => {
             Join the smart fleet movement. Manage individual vehicles or entire enterprise fleets with unparalleled ease and security.
           </p>
           <Link to="/signup">
-            <Button variant="primary" size="xl" className="px-12 rounded-full shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.5)]">
+            <Button variant="primary" size="xl" className="px-12 rounded-full shadow-[0_0_40px_rgba(var(--accent-rgb),0.3)] hover:shadow-[0_0_60px_rgba(var(--accent-rgb),0.5)]">
               Initialize Dashboard <Zap className="w-5 h-5 ml-2 text-yellow-300" />
             </Button>
           </Link>

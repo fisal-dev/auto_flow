@@ -8,10 +8,10 @@ import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 
 const vehicles = [
-  { id: 1, make: "Toyota", model: "Corolla", year: 2020, vin: "1HGCM82633A123456", registration: "ABC-1234", status: "success", label: "Healthy" },
-  { id: 2, make: "Honda", model: "Civic", year: 2019, vin: "1HGCM82633A654321", registration: "XYZ-5678", status: "warning", label: "Service Due" },
-  { id: 3, make: "Ford", model: "F-150", year: 2021, vin: "1HGCM82633A789012", registration: "LMN-9101", status: "success", label: "Healthy" },
-  { id: 4, make: "Tesla", model: "Model 3", year: 2023, vin: "5YJ3E1EA5NF202345", registration: "EV-0001", status: "success", label: "Healthy" },
+  { id: 1, make: "Tata", model: "Nexon", year: 2022, vin: "MAT543210NJ123456", registration: "MH-12-AB-1234", status: "success", label: "Healthy" },
+  { id: 2, make: "Maruti Suzuki", model: "Swift", year: 2021, vin: "MA3456789NJ654321", registration: "DL-3C-XY-5678", status: "warning", label: "Service Due" },
+  { id: 3, make: "Mahindra", model: "Thar", year: 2023, vin: "MAT789012NJ789012", registration: "KA-51-LM-9101", status: "success", label: "Healthy" },
+  { id: 4, make: "Hyundai", model: "Creta", year: 2023, vin: "MAL202345NJ202345", registration: "HR-26-EV-0001", status: "success", label: "Healthy" },
 ];
 
 const containerVariants = {
@@ -78,7 +78,7 @@ const VehicleList = () => {
             >
               {filtered.map((veh) => (
                 <motion.div key={veh.id} variants={itemVariants} layout className="h-full">
-                  <Card variant="bordered" className="flex flex-col h-full bg-[#0D1424]/80 group relative overflow-hidden" glowingBorder={veh.status === 'warning'}>
+                  <Card variant="bordered" className="flex flex-col h-full bg-surface/80 group relative overflow-hidden" glowingBorder={veh.status === 'warning'}>
                     
                     {/* Status ambient glow */}
                     {veh.status === 'warning' && (
@@ -99,7 +99,7 @@ const VehicleList = () => {
                           <Car className="w-6 h-6" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-extrabold text-white leading-tight flex items-center gap-1.5">
+                          <h3 className="text-xl font-extrabold text-foreground leading-tight flex items-center gap-1.5">
                             {veh.make} <span className="text-slate-400 font-semibold">{veh.model}</span>
                           </h3>
                           <p className="text-slate-500 text-xs mt-1 font-semibold tracking-wider uppercase">Year {veh.year}</p>
@@ -145,7 +145,7 @@ const VehicleList = () => {
                <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-6 h-6 text-slate-500" />
                </div>
-               <h3 className="text-lg font-bold text-white mb-2">No vehicles found</h3>
+               <h3 className="text-lg font-bold text-foreground mb-2">No vehicles found</h3>
                <p className="text-slate-400 text-sm">Try adjusting your search terms or filters.</p>
             </motion.div>
           )}

@@ -8,9 +8,9 @@ import Button from "./ui/Button";
 
 const ComplaintHistory = () => {
   const [complaints] = useState([
-    { id: 1, vehicle: "Toyota Corolla", complaint: "Engine overheating after 30 miles", date: "Feb 10, 2025", status: "danger", label: "Open" },
-    { id: 2, vehicle: "Honda Civic", complaint: "Brake squealing at low speeds", date: "Jan 25, 2025", status: "success", label: "Resolved" },
-    { id: 3, vehicle: "Ford F-150", complaint: "Transmission slipping in 3rd gear", date: "Jan 12, 2025", status: "warning", label: "Investigating" },
+    { id: 1, vehicle: "Tata Nexon", complaint: "Engine overheating after 50 km", date: "Feb 10, 2025", status: "danger", label: "Open" },
+    { id: 2, vehicle: "Maruti Suzuki Swift", complaint: "Brake squealing at low speeds", date: "Jan 25, 2025", status: "success", label: "Resolved" },
+    { id: 3, vehicle: "Mahindra Thar", complaint: "Transmission slipping in 3rd gear", date: "Jan 12, 2025", status: "warning", label: "Investigating" },
   ]);
 
   return (
@@ -31,9 +31,9 @@ const ComplaintHistory = () => {
         </div>
 
         {/* Complaints history list card */}
-        <Card variant="bordered" className="p-0 overflow-hidden bg-[#0D1424]/80">
+        <Card variant="bordered" className="p-0 overflow-hidden bg-surface/80">
           <div className="p-6 border-b border-white/5 flex justify-between items-center">
-            <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
+            <h2 className="text-lg font-extrabold text-foreground flex items-center gap-2">
               <MessageSquareWarning className="w-5 h-5 text-indigo-400" /> Ticket History
             </h2>
           </div>
@@ -57,11 +57,13 @@ const ComplaintHistory = () => {
                 <tbody>
                   {complaints.map((item) => (
                     <tr key={item.id}>
-                      <td className="pl-6 font-bold text-white flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
-                          <Car className="w-3 h-3 text-slate-400" />
+                      <td className="pl-6">
+                        <div className="font-bold text-foreground flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+                            <Car className="w-3 h-3 text-slate-400" />
+                          </div>
+                          {item.vehicle}
                         </div>
-                        {item.vehicle}
                       </td>
                       <td className="font-semibold text-slate-300 max-w-md truncate" title={item.complaint}>
                         {item.complaint}

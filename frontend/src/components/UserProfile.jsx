@@ -46,7 +46,7 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <Card variant="bordered" className="bg-[#0D1424]/80 p-8 relative overflow-hidden">
+        <Card variant="bordered" className="bg-surface/80 p-8 relative overflow-hidden">
           
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none -mr-20 -mt-20" />
 
@@ -55,12 +55,12 @@ const UserProfile = () => {
                <div className="w-24 h-24 rounded-full bg-indigo-500/20 border-2 border-indigo-500/40 flex items-center justify-center text-indigo-400 text-3xl font-extrabold group-hover:border-indigo-400 transition-colors">
                  JD
                </div>
-               <div className="absolute bottom-0 right-0 p-1.5 bg-indigo-500 text-white rounded-full border-2 border-[#0D1424]">
+               <div className="absolute bottom-0 right-0 p-1.5 bg-indigo-500 text-white rounded-full border-2 border-background">
                  <Camera className="w-4 h-4" />
                </div>
              </div>
              <div className="text-center sm:text-left">
-               <h2 className="text-2xl font-extrabold text-white">{profile.name}</h2>
+               <h2 className="text-2xl font-extrabold text-foreground">{profile.name}</h2>
                <div className="flex items-center gap-2 mt-1 justify-center sm:justify-start text-emerald-400 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded-md w-max">
                  <ShieldCheck className="w-3.5 h-3.5" /> Verified Account
                </div>
@@ -133,9 +133,9 @@ const UserProfile = () => {
                 name="notifications"
                 checked={profile.notifications}
                 onChange={handleChange}
-                className="w-5 h-5 rounded bg-[#0D121F]/70 border-white/10 text-indigo-500 focus:ring-indigo-500/50 focus:ring-offset-[#0B0F19]"
+                className="w-5 h-5 rounded bg-background/70 border-white/10 text-indigo-500 focus:ring-indigo-500/50 focus:ring-offset-background"
               />
-              <span className="group-hover:text-white transition-colors font-semibold">Enable critical system alerts via SMS/Email</span>
+              <span className="group-hover:text-foreground transition-colors font-semibold">Enable critical system alerts via SMS/Email</span>
             </label>
 
             {success && (

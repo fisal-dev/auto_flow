@@ -78,6 +78,10 @@ const DashboardLayout = ({ children }) => {
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/");
 
+  const handleSignOut = () => {
+    localStorage.removeItem("isLoggedIn");
+  };
+
   const pageTitle = (() => {
     for (const g of navGroups) {
       for (const item of g.items) {
@@ -90,22 +94,22 @@ const DashboardLayout = ({ children }) => {
   })();
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-slate-100 flex relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-background text-foreground flex relative overflow-hidden font-sans transition-colors duration-300">
 
       {/* Ambient glows */}
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-indigo-600/6 rounded-full blur-[140px] pointer-events-none -translate-y-1/4 translate-x-1/4" />
-      <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-emerald-600/4 rounded-full blur-[120px] pointer-events-none translate-y-1/4 -translate-x-1/4" />
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/4 translate-x-1/4 transition-colors duration-300" />
+      <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none translate-y-1/4 -translate-x-1/4 transition-colors duration-300" />
 
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden lg:flex flex-col w-[240px] flex-shrink-0 border-r border-white/5 z-30 h-screen sticky top-0 bg-[#0A0F1C]/80 backdrop-blur-xl">
+      <aside className="hidden lg:flex flex-col w-[240px] flex-shrink-0 border-r border-white/5 z-30 h-screen sticky top-0 bg-surface/80 backdrop-blur-xl transition-colors duration-300">
         
         {/* Brand */}
         <div className="p-5 border-b border-white/5">
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-14 h-14 rounded-lg overflow-hidden flex items-center justify-center border border-indigo-500/25 group-hover:border-indigo-500/40 transition-all duration-200 shadow-[0_0_15px_rgba(99,102,241,0.15)] bg-[#0B0F19]">
+            <div className="w-14 h-14 rounded-lg overflow-hidden flex items-center justify-center border border-indigo-500/20 group-hover:border-indigo-500/40 transition-all duration-200 shadow-[0_0_15px_rgba(var(--accent-rgb),0.15)] bg-background">
               <img src="/autoflow_logo.png" alt="AutoFlow Logo" className="w-full h-full object-cover scale-[1.15]" />
             </div>
-            <span className="text-base font-bold text-white tracking-tight">
+            <span className="text-base font-bold text-foreground tracking-tight">
               Auto<span className="text-indigo-400">Flow</span>
             </span>
           </Link>
@@ -115,7 +119,7 @@ const DashboardLayout = ({ children }) => {
         <nav className="flex-grow overflow-y-auto custom-scrollbar py-4 px-3 space-y-5">
           {navGroups.map((group) => (
             <div key={group.label}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600 px-3.5 mb-2">
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 px-3.5 mb-2">
                 {group.label}
               </p>
               <div className="space-y-0.5">
@@ -131,6 +135,7 @@ const DashboardLayout = ({ children }) => {
         <div className="p-3 border-t border-white/5">
           <Link
             to="/login"
+            onClick={handleSignOut}
             className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-400/80 hover:text-rose-400 hover:bg-rose-500/8 transition-all duration-200"
           >
             <LogOut className="w-4 h-4 flex-shrink-0" />
@@ -155,14 +160,14 @@ const DashboardLayout = ({ children }) => {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.38 }}
-              className="fixed inset-y-0 left-0 w-[240px] z-50 lg:hidden flex flex-col bg-[#0A0F1C] border-r border-white/5"
+              className="fixed inset-y-0 left-0 w-[240px] z-50 lg:hidden flex flex-col bg-surface border-r border-white/5"
             >
               <div className="p-5 border-b border-white/5 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-md overflow-hidden flex items-center justify-center border border-indigo-500/25 bg-[#0B0F19]">
+                  <div className="w-7 h-7 rounded-md overflow-hidden flex items-center justify-center border border-indigo-500/20 bg-background">
                     <img src="/autoflow_logo.png" alt="AutoFlow Logo" className="w-full h-full object-cover scale-[1.15]" />
                   </div>
-                  <span className="font-bold text-white">Auto<span className="text-indigo-400">Flow</span></span>
+                  <span className="font-bold text-foreground">Auto<span className="text-indigo-400">Flow</span></span>
                 </Link>
                 <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 rounded-lg bg-white/5 text-slate-400">
                   <X className="w-4 h-4" />
@@ -172,7 +177,7 @@ const DashboardLayout = ({ children }) => {
               <nav className="flex-grow overflow-y-auto custom-scrollbar py-4 px-3 space-y-5">
                 {navGroups.map((group) => (
                   <div key={group.label}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600 px-3.5 mb-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 px-3.5 mb-2">
                       {group.label}
                     </p>
                     <div className="space-y-0.5">
@@ -192,7 +197,10 @@ const DashboardLayout = ({ children }) => {
               <div className="p-3 border-t border-white/5">
                 <Link
                   to="/login"
-                  onClick={() => setIsSidebarOpen(false)}
+                  onClick={() => {
+                    handleSignOut();
+                    setIsSidebarOpen(false);
+                  }}
                   className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-400/80 hover:text-rose-400 hover:bg-rose-500/8 transition-all"
                 >
                   <LogOut className="w-4 h-4" />
@@ -208,13 +216,13 @@ const DashboardLayout = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
 
         {/* Top Bar */}
-        <header className="sticky top-0 z-20 bg-[#080C14]/80 backdrop-blur-xl border-b border-white/5">
+        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-white/5 transition-colors duration-300">
           <div className="px-4 lg:px-6 py-3.5 flex items-center justify-between gap-4">
             
             {/* Mobile menu btn + breadcrumb */}
             <div className="flex items-center gap-3">
               <button
-                className="lg:hidden p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                className="lg:hidden p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-foreground transition-colors"
                 onClick={() => setIsSidebarOpen(true)}
               >
                 <Menu className="w-4 h-4" />
@@ -230,13 +238,13 @@ const DashboardLayout = ({ children }) => {
             <div className="flex items-center gap-2">
               <Link
                 to="/notifications"
-                className="p-2 rounded-lg bg-white/4 hover:bg-white/8 text-slate-400 hover:text-white transition-all border border-white/5 hover:border-white/10 relative"
+                className="p-2 rounded-lg bg-indigo-500/5 hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-400 transition-all border border-indigo-500/10 hover:border-indigo-500/20 relative"
               >
                 <Bell className="w-4 h-4" />
                 <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-400 rounded-full" />
               </Link>
-              <Link to="/profile" className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/4 hover:bg-white/8 border border-white/5 hover:border-white/10 transition-all">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white text-[10px] font-bold">
+              <Link to="/profile" className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/10 hover:border-indigo-500/20 transition-all">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-bold">
                   JD
                 </div>
                 <span className="hidden sm:inline text-xs font-semibold text-slate-300">John D.</span>

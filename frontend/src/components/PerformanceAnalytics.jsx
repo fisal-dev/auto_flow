@@ -1,17 +1,17 @@
 import React from "react";
-import { GaugeCircle, DollarSign, Droplet, TrendingUp } from "lucide-react";
+import { GaugeCircle, IndianRupee, Droplet, TrendingUp } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 
 const PerformanceAnalytics = () => {
   const maintenanceData = [
-    { month: "Jan", cost: 200 },
-    { month: "Feb", cost: 150 },
-    { month: "Mar", cost: 300 },
-    { month: "Apr", cost: 250 },
-    { month: "May", cost: 400 },
-    { month: "Jun", cost: 350 },
+    { month: "Jan", cost: 20000 },
+    { month: "Feb", cost: 15000 },
+    { month: "Mar", cost: 30000 },
+    { month: "Apr", cost: 25000 },
+    { month: "May", cost: 40000 },
+    { month: "Jun", cost: 35000 },
   ];
 
   const fuelConsumptionData = [
@@ -28,7 +28,7 @@ const PerformanceAnalytics = () => {
       return (
         <div className="glass-card px-4 py-3 border-white/10 shadow-xl">
           <p className="text-slate-400 text-xs font-bold tracking-wider mb-1">{label} 2024</p>
-          <p className="text-white text-lg font-extrabold flex items-center">
+          <p className="text-foreground text-lg font-extrabold flex items-center">
              <span className="text-indigo-400 mr-1">{prefix}</span>
              {payload[0].value}
              <span className="text-slate-400 ml-1 text-sm">{suffix}</span>
@@ -55,12 +55,12 @@ const PerformanceAnalytics = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Maintenance Chart Card */}
-          <Card variant="bordered" delay={0.1} className="p-6 bg-[#0D1424]/80 flex flex-col justify-between h-[450px]">
+          <Card variant="bordered" delay={0.1} className="p-6 bg-surface/80 flex flex-col justify-between h-[450px]">
             <div className="mb-6 flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-extrabold text-white flex items-center gap-2 mb-1">
+                <h2 className="text-lg font-extrabold text-foreground flex items-center gap-2 mb-1">
                   <div className="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
-                     <DollarSign className="text-indigo-400 w-4 h-4" />
+                      <IndianRupee className="text-indigo-400 w-4 h-4" />
                   </div>
                   Upkeep Expenditures
                 </h2>
@@ -82,8 +82,8 @@ const PerformanceAnalytics = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.05)" vertical={false} />
                   <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} dy={10} />
-                  <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} dx={-10} tickFormatter={(v)=>`$${v}`} />
-                  <Tooltip content={<CustomTooltip prefix="$" />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                  <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} dx={-10} tickFormatter={(v)=>`₹${v}`} />
+                  <Tooltip content={<CustomTooltip prefix="₹" />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }} />
                   <Area type="monotone" dataKey="cost" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorCostPerf)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -91,10 +91,10 @@ const PerformanceAnalytics = () => {
           </Card>
 
           {/* Fuel Consumption Chart Card */}
-          <Card variant="bordered" delay={0.2} className="p-6 bg-[#0D1424]/80 flex flex-col justify-between h-[450px]">
+          <Card variant="bordered" delay={0.2} className="p-6 bg-surface/80 flex flex-col justify-between h-[450px]">
             <div className="mb-6 flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-extrabold text-white flex items-center gap-2 mb-1">
+                <h2 className="text-lg font-extrabold text-foreground flex items-center gap-2 mb-1">
                   <div className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
                      <Droplet className="text-emerald-400 w-4 h-4" />
                   </div>

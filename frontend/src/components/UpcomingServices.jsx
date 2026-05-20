@@ -30,17 +30,17 @@ const UpcomingServices = () => {
 
         {/* Schedule Grid */}
         {services.length === 0 ? (
-          <Card variant="bordered" className="text-center py-24 bg-[#0D1424]/80">
+          <Card variant="bordered" className="text-center py-24 bg-surface/80">
             <div className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-500 mb-5 glow-sm">
               <CalendarClock className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No tasks scheduled</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">No tasks scheduled</h3>
             <p className="text-slate-400 text-sm">All systems are currently running within healthy parameters.</p>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {services.map((item, i) => (
-              <Card key={item.id} variant="bordered" delay={i * 0.1} glowingBorder={item.status === 'warning'} className="p-6 flex flex-col justify-between min-h-[220px] bg-[#0D1424]/80 group relative overflow-hidden">
+              <Card key={item.id} variant="bordered" delay={i * 0.1} glowingBorder={item.status === 'warning'} className="p-6 flex flex-col justify-between min-h-[220px] bg-surface/80 group relative overflow-hidden">
                 
                 {item.status === 'warning' && (
                    <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-[30px] -mr-5 -mt-5 pointer-events-none"></div>
@@ -57,7 +57,7 @@ const UpcomingServices = () => {
                 </div>
 
                 <div className="my-2 relative z-10 flex-grow">
-                  <h3 className="text-xl font-extrabold text-white leading-tight mb-3 group-hover:text-indigo-300 transition-colors">
+                  <h3 className="text-xl font-extrabold text-foreground leading-tight mb-3 group-hover:text-indigo-300 transition-colors">
                     {item.service}
                   </h3>
                   

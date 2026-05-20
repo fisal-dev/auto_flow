@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Fuel, Plus, CalendarClock, DollarSign, Gauge, Car, ArrowRight, Droplet } from "lucide-react";
+import { Fuel, Plus, CalendarClock, IndianRupee, Gauge, Car, ArrowRight, Droplet } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 
 const FuelConsumption = () => {
   const [fuelLogs, setFuelLogs] = useState([
-    { vehicle: "Toyota Camry", date: "Feb 01, 2024", liters: 40, cost: 42, mileage: 45000 },
-    { vehicle: "Honda Civic", date: "Feb 05, 2024", liters: 35, cost: 38, mileage: 52000 }
+    { vehicle: "Tata Nexon", date: "Feb 01, 2024", liters: 40, cost: 4200, mileage: 45000 },
+    { vehicle: "Maruti Suzuki Swift", date: "Feb 05, 2024", liters: 35, cost: 3675, mileage: 52000 }
   ]);
 
   const [newLog, setNewLog] = useState({
@@ -62,12 +62,12 @@ const FuelConsumption = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Form Entry Card */}
-          <Card variant="bordered" delay={0.1} className="lg:col-span-1 p-6 bg-[#0D1424]/80 flex flex-col justify-between relative overflow-hidden">
+          <Card variant="bordered" delay={0.1} className="lg:col-span-1 p-6 bg-surface/80 flex flex-col justify-between relative overflow-hidden">
             
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-[40px] pointer-events-none -mr-10 -mt-10" />
 
             <div className="relative z-10">
-              <h2 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
+              <h2 className="text-xl font-extrabold text-foreground mb-6 flex items-center gap-2">
                 <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
                    <Plus className="text-indigo-400 w-4 h-4" />
                 </div>
@@ -85,7 +85,7 @@ const FuelConsumption = () => {
                     <input
                       type="text"
                       name="vehicle"
-                      placeholder="e.g. Toyota Camry"
+                      placeholder="e.g. Tata Nexon"
                       value={newLog.vehicle}
                       onChange={handleChange}
                       className="input-field pl-10"
@@ -134,10 +134,10 @@ const FuelConsumption = () => {
 
                   {/* Price Cost */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cost ($)</label>
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cost (₹)</label>
                     <div className="relative group">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-emerald-400 transition-colors">
-                        <DollarSign className="w-4 h-4" />
+                        <IndianRupee className="w-4 h-4" />
                       </span>
                       <input
                         type="number"
@@ -179,9 +179,9 @@ const FuelConsumption = () => {
           </Card>
 
           {/* History logs Card */}
-          <Card variant="bordered" delay={0.2} className="lg:col-span-2 p-0 overflow-hidden bg-[#0D1424]/80">
+          <Card variant="bordered" delay={0.2} className="lg:col-span-2 p-0 overflow-hidden bg-surface/80">
             <div className="p-6 border-b border-white/5">
-               <h2 className="text-lg font-extrabold text-white">Refueling Timeline</h2>
+               <h2 className="text-lg font-extrabold text-foreground">Refueling Timeline</h2>
             </div>
 
             {fuelLogs.length === 0 ? (
@@ -204,11 +204,13 @@ const FuelConsumption = () => {
                   <tbody>
                     {fuelLogs.map((log, index) => (
                       <tr key={index}>
-                        <td className="pl-6 font-bold text-white flex items-center gap-2">
-                           <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
-                             <Car className="w-3 h-3 text-slate-400" />
+                        <td className="pl-6">
+                           <div className="font-bold text-foreground flex items-center gap-2">
+                             <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+                               <Car className="w-3 h-3 text-slate-400" />
+                             </div>
+                             {log.vehicle}
                            </div>
-                           {log.vehicle}
                         </td>
                         <td className="text-slate-400">
                           <span className="flex items-center gap-1.5">
@@ -216,8 +218,10 @@ const FuelConsumption = () => {
                             {log.date}
                           </span>
                         </td>
-                        <td className="font-semibold text-slate-300 flex items-center gap-1">
-                           <Droplet className="w-3.5 h-3.5 text-slate-500" /> {log.liters}L
+                        <td className="font-semibold text-slate-300">
+                           <div className="flex items-center gap-1">
+                             <Droplet className="w-3.5 h-3.5 text-slate-500" /> {log.liters}L
+                           </div>
                         </td>
                         <td className="text-slate-400 font-mono text-xs">
                           <span className="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded w-max">
@@ -227,7 +231,7 @@ const FuelConsumption = () => {
                         </td>
                         <td className="pr-6 font-extrabold text-emerald-400 text-right">
                           <span className="flex items-center justify-end gap-0.5">
-                            <DollarSign className="w-3.5 h-3.5" />
+                            <IndianRupee className="w-3.5 h-3.5" />
                             {log.cost}
                           </span>
                         </td>

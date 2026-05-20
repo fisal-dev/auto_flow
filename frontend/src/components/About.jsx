@@ -33,14 +33,14 @@ const About = () => {
   ];
 
   const colors = {
-    indigo: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]",
+    indigo: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20 shadow-[0_0_15px_rgba(var(--accent-rgb),0.1)]",
     emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]",
     amber: "text-amber-400 bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]",
     rose: "text-rose-400 bg-rose-500/10 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
   };
 
   return (
-    <div className="bg-[#080C14] text-slate-100 min-h-screen relative overflow-hidden flex flex-col pt-24 pb-20">
+    <div className="bg-background text-foreground min-h-screen relative overflow-hidden flex flex-col pt-24 pb-20 transition-colors duration-300">
       {/* Decorative Blur Background Glows */}
       <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute bottom-20 left-10 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px] pointer-events-none"></div>
@@ -65,7 +65,7 @@ const About = () => {
           {highlights.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <Card key={idx} glowingBorder={false} hoverEffect={true} className="p-8 flex gap-5 items-start bg-[#0D1424]/60">
+              <Card key={idx} glowingBorder={false} hoverEffect={true} className="p-8 flex gap-5 items-start bg-surface/60">
                 <div className={`p-4 rounded-2xl border flex-shrink-0 ${colors[item.color]}`}>
                   <Icon className="text-2xl" />
                 </div>

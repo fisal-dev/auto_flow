@@ -6,9 +6,9 @@ import Button from "./ui/Button";
 
 const ServiceCenters = () => {
   const [centers] = useState([
-    { name: "Auto Care Garage", location: "New York, NY", contact: "(123) 456-7890", rating: 4.8, status: "Open" },
-    { name: "Elite Mechanics", location: "Los Angeles, CA", contact: "(987) 654-3210", rating: 4.5, status: "Open" },
-    { name: "Speedy Tires", location: "Chicago, IL", contact: "(555) 123-4567", rating: 4.2, status: "Closed" },
+    { name: "Mumbai Auto Care Garage", location: "Andheri East, Mumbai", contact: "+91 98765 43210", rating: 4.8, status: "Open" },
+    { name: "Delhi Elite Mechanics", location: "Connaught Place, New Delhi", contact: "+91 98123 45678", rating: 4.5, status: "Open" },
+    { name: "Bangalore Speedy Tires", location: "Indiranagar, Bengaluru", contact: "+91 80555 12345", rating: 4.2, status: "Closed" },
   ]);
 
   return (
@@ -28,17 +28,17 @@ const ServiceCenters = () => {
 
         {/* Center Grid */}
         {centers.length === 0 ? (
-          <Card variant="bordered" className="text-center py-24 bg-[#0D1424]/80">
+          <Card variant="bordered" className="text-center py-24 bg-surface/80">
             <div className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-500 mb-5 glow-sm">
               <MapPin className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No service hubs registered</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">No service hubs registered</h3>
             <p className="text-slate-400 text-sm">Start by registering your first servicing vendor.</p>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {centers.map((center, index) => (
-              <Card key={index} variant="bordered" delay={index * 0.1} hoverEffect className="p-6 flex flex-col justify-between h-full bg-[#0D1424]/80 group">
+              <Card key={index} variant="bordered" delay={index * 0.1} hoverEffect className="p-6 flex flex-col justify-between h-full bg-surface/80 group">
                 
                 <div>
                   <div className="flex justify-between items-start mb-4">
@@ -47,11 +47,11 @@ const ServiceCenters = () => {
                     </div>
                     <div className="flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg border border-white/10">
                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                       <span className="text-xs font-bold text-white">{center.rating}</span>
+                       <span className="text-xs font-bold text-foreground">{center.rating}</span>
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-extrabold text-white mb-2 leading-tight group-hover:text-indigo-300 transition-colors">
+                  <h3 className="text-xl font-extrabold text-foreground mb-2 leading-tight group-hover:text-indigo-300 transition-colors">
                     {center.name}
                   </h3>
                   

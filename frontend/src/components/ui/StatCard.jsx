@@ -8,7 +8,7 @@ const colorMap = {
     bg:     "bg-indigo-500/10",
     border: "border-indigo-500/20",
     bar:    "bg-indigo-500",
-    glow:   "shadow-[0_0_20px_rgba(99,102,241,0.12)]",
+    glow:   "shadow-[0_0_20px_rgba(var(--accent-rgb),0.12)]",
     ambient:"bg-indigo-500/10",
   },
   emerald: {

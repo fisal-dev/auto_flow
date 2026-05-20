@@ -50,7 +50,7 @@ const Report = () => {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+              <h1 className="text-2xl font-extrabold text-foreground flex items-center gap-2">
                 <AlertCircle className="text-rose-500 w-6 h-6" /> Log Complaint
               </h1>
               <p className="text-sm text-slate-400">Report an operational or mechanical issue</p>
@@ -58,7 +58,7 @@ const Report = () => {
           </div>
         </div>
 
-        <Card variant="bordered" className="bg-[#0D1424]/80 p-8 sm:p-10 relative overflow-hidden">
+        <Card variant="bordered" className="bg-surface/80 p-8 sm:p-10 relative overflow-hidden">
           
           {/* Subtle danger glow */}
           <div className="absolute -top-32 -right-32 w-64 h-64 bg-rose-500/10 rounded-full blur-[80px] pointer-events-none" />
@@ -68,7 +68,7 @@ const Report = () => {
               <div className="mx-auto w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mb-6 glow-emerald">
                 <CheckCircle2 className="w-10 h-10 text-emerald-400" />
               </div>
-              <h2 className="text-3xl font-extrabold text-white mb-3">Complaint Registered</h2>
+              <h2 className="text-3xl font-extrabold text-foreground mb-3">Complaint Registered</h2>
               <p className="text-slate-400 mb-8 max-w-sm mx-auto">
                 Your issue has been logged securely and added to the incident response queue. Redirecting...
               </p>
@@ -89,7 +89,7 @@ const Report = () => {
                     value={complaint.vehicle}
                     onChange={handleChange}
                     className="input-field pl-10 focus:border-rose-500/60 focus:shadow-[0_0_0_3px_rgba(244,63,94,0.12)]"
-                    placeholder="e.g. Toyota Camry"
+                    placeholder="e.g. Tata Nexon"
                     required
                   />
                 </div>
