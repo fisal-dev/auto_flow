@@ -6,8 +6,10 @@ import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const Maintenance = () => {
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [records, setRecords] = useState([]);
   const [vehicles, setVehicles] = useState([]);
@@ -49,7 +51,24 @@ const Maintenance = () => {
   };
 
   useEffect(() => {
-    loadData();
+    const sessionId = queryParams.get("session_id");
+
+    const runVerificationAndLoad = async () => {
+      if (paySuccess && sessionId) {
+        // Clear query parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+        try {
+          await api.post("/stripe/verify-session", { sessionId });
+          toast.success("Payment verified and completed successfully!");
+        } catch (err) {
+          console.error("Error verifying payment session:", err);
+          toast.error("Failed to verify payment session.");
+        }
+      }
+      await loadData();
+    };
+
+    runVerificationAndLoad();
   }, []);
 
   const handleChange = (e) => {
@@ -60,7 +79,7 @@ const Maintenance = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newRecord.vehicleId || !newRecord.service || !newRecord.provider) {
-      alert("Please fill in all required fields.");
+      toast.warning("Please fill in all required fields.");
       return;
     }
     try {
@@ -79,8 +98,9 @@ const Maintenance = () => {
         status: "success",
         label: "Completed"
       });
+      toast.success("Maintenance service logged successfully!");
     } catch (err) {
-      alert(err.message || "Failed to log maintenance record.");
+      toast.error(err.message || "Failed to log maintenance record.");
     }
   };
 
@@ -94,7 +114,7 @@ const Maintenance = () => {
         throw new Error("Payment session URL not returned");
       }
     } catch (err) {
-      alert(err.message || "Failed to initiate payment");
+      toast.error(err.message || "Failed to initiate payment");
     } finally {
       setPaymentProcessingId(null);
     }

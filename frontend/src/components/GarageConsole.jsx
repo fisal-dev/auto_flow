@@ -5,8 +5,10 @@ import Card from "./ui/Card";
 import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const GarageConsole = () => {
+  const toast = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [vehicle, setVehicle] = useState(null);
   const [searched, setSearched] = useState(false);
@@ -131,7 +133,7 @@ const GarageConsole = () => {
   const submitLogService = async (e) => {
     e.preventDefault();
     if (!logForm.service || !logForm.provider) {
-      alert("Service description and Service Center location are required.");
+      toast.warning("Service description and Service Center location are required.");
       return;
     }
     
@@ -146,10 +148,10 @@ const GarageConsole = () => {
         status: logForm.status,
         label: logForm.label
       });
-      alert("Maintenance record logged successfully! Customer has been notified.");
+      toast.success("Maintenance record logged successfully! Customer has been notified.");
       setIsLogModalOpen(false);
     } catch (err) {
-      alert(err.message || "Failed to log service ticket.");
+      toast.error(err.message || "Failed to log service ticket.");
     } finally {
       setSubmittingLog(false);
     }
@@ -159,7 +161,7 @@ const GarageConsole = () => {
     e.preventDefault();
     const { make, model, year, vin, registration, customerEmail } = registerForm;
     if (!make || !model || !year || !vin || !registration || !customerEmail) {
-      alert("Make, model, year, VIN, registration, and customer email are required.");
+      toast.warning("Make, model, year, VIN, registration, and customer email are required.");
       return;
     }
 
@@ -175,7 +177,7 @@ const GarageConsole = () => {
         setIsLogModalOpen(true);
       }, 300);
     } catch (err) {
-      alert(err.message || "Failed to quick register vehicle/customer.");
+      toast.error(err.message || "Failed to quick register vehicle/customer.");
     } finally {
       setSubmittingRegister(false);
     }

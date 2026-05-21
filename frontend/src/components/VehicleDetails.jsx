@@ -6,8 +6,10 @@ import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const VehicleDetails = () => {
+  const toast = useToast();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
@@ -42,10 +44,10 @@ const VehicleDetails = () => {
     if (window.confirm("Are you sure you want to remove this vehicle from your fleet?")) {
       try {
         await api.delete(`/vehicles/${id}`);
-        alert("Vehicle successfully removed.");
+        toast.success("Vehicle successfully removed.");
         navigate("/vehicles");
       } catch (err) {
-        alert(err.message || "Failed to delete vehicle.");
+        toast.error(err.message || "Failed to delete vehicle.");
       }
     }
   };

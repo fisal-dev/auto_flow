@@ -5,8 +5,10 @@ import Card from "./ui/Card";
 import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const ManagerManagement = () => {
+  const toast = useToast();
   const [managers, setManagers] = useState([]);
   const [garages, setGarages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,22 +89,23 @@ const ManagerManagement = () => {
   const handleCreateManager = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.password) {
-      alert("Name, email and password are required.");
+      toast.warning("Name, email and password are required.");
       return;
     }
     try {
       const res = await api.post("/user/managers", formData);
       setManagers(prev => [res, ...prev]);
       setIsAddModalOpen(false);
+      toast.success("Manager account registered successfully!");
     } catch (err) {
-      alert(err.message || "Failed to create manager account.");
+      toast.error(err.message || "Failed to create manager account.");
     }
   };
 
   const handleUpdateManager = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
-      alert("Name and email are required.");
+      toast.warning("Name and email are required.");
       return;
     }
     try {
@@ -117,8 +120,9 @@ const ManagerManagement = () => {
       const res = await api.put(`/user/managers/${selectedManager._id}`, updatePayload);
       setManagers(prev => prev.map(m => m._id === selectedManager._id ? res : m));
       setIsEditModalOpen(false);
+      toast.success("Manager updated successfully!");
     } catch (err) {
-      alert(err.message || "Failed to update manager account.");
+      toast.error(err.message || "Failed to update manager account.");
     }
   };
 
@@ -129,8 +133,9 @@ const ManagerManagement = () => {
     try {
       await api.delete(`/user/managers/${managerId}`);
       setManagers(prev => prev.filter(m => m._id !== managerId));
+      toast.success("Manager terminated successfully.");
     } catch (err) {
-      alert(err.message || "Failed to terminate manager account.");
+      toast.error(err.message || "Failed to terminate manager account.");
     }
   };
 

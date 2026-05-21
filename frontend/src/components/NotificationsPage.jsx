@@ -5,8 +5,10 @@ import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const NotificationsPage = () => {
+  const toast = useToast();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,8 +55,9 @@ const NotificationsPage = () => {
       try {
         await api.delete("/notifications");
         setNotifications([]);
+        toast.success("Notifications cleared successfully.");
       } catch (err) {
-        alert(err.message || "Failed to clear notifications.");
+        toast.error(err.message || "Failed to clear notifications.");
       }
     }
   };

@@ -85,7 +85,7 @@ const stripeController = {
           },
         ],
         mode: 'payment',
-        success_url: `http://localhost:8080/maintenance?success=true&record_id=${record._id}`,
+        success_url: `http://localhost:8080/maintenance?success=true&session_id={CHECKOUT_SESSION_ID}&record_id=${record._id}`,
         cancel_url: `http://localhost:8080/maintenance?success=false`,
         metadata: {
           recordId: record._id.toString(),
@@ -100,6 +100,59 @@ const stripeController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Stripe invoice creation error: ' + err.message });
+    }
+  },
+
+  verifySession: async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ message: 'Session ID is required' });
+      }
+
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!session) {
+        return res.status(404).json({ message: 'Session not found' });
+      }
+
+      if (session.payment_status === 'paid' || session.status === 'complete') {
+        const { type, userId, recordId } = session.metadata || {};
+
+        if (type === 'subscription' || session.mode === 'subscription') {
+          const targetUserId = userId || session.client_reference_id || req.user.id;
+          const updatedUser = await User.findByIdAndUpdate(
+            targetUserId, 
+            { subscriptionStatus: 'premium' },
+            { new: true }
+          );
+          console.log(`User ${targetUserId} verified and upgraded to premium via redirect.`);
+          return res.json({ success: true, status: 'premium', user: updatedUser });
+        } else if (type === 'invoice' || session.mode === 'payment') {
+          const targetRecordId = recordId;
+          let updatedRecord;
+          if (targetRecordId) {
+            updatedRecord = await MaintenanceRecord.findByIdAndUpdate(
+              targetRecordId, 
+              { paymentStatus: 'paid' },
+              { new: true }
+            );
+            console.log(`Invoice ${targetRecordId} verified and marked as paid via redirect.`);
+          } else {
+            updatedRecord = await MaintenanceRecord.findOneAndUpdate(
+              { stripeSessionId: session.id }, 
+              { paymentStatus: 'paid' },
+              { new: true }
+            );
+            console.log(`Invoice with session id ${session.id} verified and marked as paid via redirect.`);
+          }
+          return res.json({ success: true, status: 'paid', record: updatedRecord });
+        }
+      }
+
+      res.json({ success: false, message: 'Payment not completed yet' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error verifying Stripe session: ' + err.message });
     }
   },
 

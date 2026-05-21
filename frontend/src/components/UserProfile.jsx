@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { User, Mail, Phone, CheckCircle2, ShieldCheck, Camera } from "lucide-react";
+import { User, Mail, Phone, CheckCircle2, ShieldCheck } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+
+const getInitials = (name) => {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return parts[0].slice(0, 2).toUpperCase();
+};
 
 const UserProfile = () => {
   const [profile, setProfile] = useState({
@@ -80,12 +89,9 @@ const UserProfile = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none -mr-20 -mt-20" />
 
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 relative z-10 border-b border-white/5 pb-8">
-             <div className="relative group cursor-pointer">
+             <div className="relative group">
                <div className="w-24 h-24 rounded-full bg-indigo-500/20 border-2 border-indigo-500/40 flex items-center justify-center text-indigo-400 text-3xl font-extrabold group-hover:border-indigo-400 transition-colors">
-                 JD
-               </div>
-               <div className="absolute bottom-0 right-0 p-1.5 bg-indigo-500 text-white rounded-full border-2 border-background">
-                 <Camera className="w-4 h-4" />
+                 {getInitials(profile.name)}
                </div>
              </div>
              <div className="text-center sm:text-left">

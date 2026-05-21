@@ -30,7 +30,10 @@ const sendEmail = async ({ to, subject, html }) => {
     },
     tls: {
       rejectUnauthorized: false // Avoid blockages from custom networks
-    }
+    },
+    connectionTimeout: 5000, // 5 seconds connection timeout
+    greetingTimeout: 5000,   // 5 seconds greeting timeout
+    socketTimeout: 5000      // 5 seconds socket timeout
   });
 
   const mailOptions = {
@@ -40,8 +43,14 @@ const sendEmail = async ({ to, subject, html }) => {
     html,
   };
 
-  // Send mail with defined transport object
-  return await transporter.sendMail(mailOptions);
+  // Send mail with defined transport object and a strict 4-second timeout wrapper (to handle DNS or socket hangs)
+  const mailPromise = transporter.sendMail(mailOptions);
+  
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('SMTP dispatch timed out')), 4000)
+  );
+
+  return await Promise.race([mailPromise, timeoutPromise]);
 };
 
 module.exports = sendEmail;

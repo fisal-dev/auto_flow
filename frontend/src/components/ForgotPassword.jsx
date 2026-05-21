@@ -13,6 +13,7 @@ const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: Request, 2: Verify Code, 3: Reset, 4: Success
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [demoCode, setDemoCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ const ForgotPassword = () => {
     setError("");
     try {
       const res = await api.post("/user/forgot-password", { email });
+      if (res && res.demoCode) {
+        setDemoCode(res.demoCode);
+      }
       setStep(2);
     } catch (err) {
       setError(err.message || "Failed to send verification code. Please check the email.");
@@ -178,6 +182,11 @@ const ForgotPassword = () => {
                 {error && (
                   <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm font-semibold text-rose-400 text-center animate-scale-in">
                     {error}
+                  </div>
+                )}
+                {demoCode && (
+                  <div className="p-3.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-sm font-medium text-slate-300 text-center animate-scale-in">
+                    Demo Mode: Use verification code <span className="font-mono font-bold text-indigo-400">{demoCode}</span> to proceed.
                   </div>
                 )}
 

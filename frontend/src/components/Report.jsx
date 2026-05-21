@@ -5,8 +5,10 @@ import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const Report = () => {
+  const toast = useToast();
   const [vehicles, setVehicles] = useState([]);
   const [complaint, setComplaint] = useState({
     vehicleId: "",
@@ -46,7 +48,7 @@ const Report = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!complaint.vehicleId || !complaint.description) {
-      alert("Please fill in all fields.");
+      toast.warning("Please fill in all fields.");
       return;
     }
 
@@ -56,12 +58,13 @@ const Report = () => {
       await api.post("/complaints", complaint);
       setLoading(false);
       setSuccess(true);
+      toast.success("Complaint registered successfully!");
       setTimeout(() => {
         navigate("/complaint-history");
       }, 1500);
     } catch (err) {
       setLoading(false);
-      alert(err.message || "Failed to log complaint ticket.");
+      toast.error(err.message || "Failed to log complaint ticket.");
     }
   };
 

@@ -6,8 +6,10 @@ import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const UpcomingServices = () => {
+  const toast = useToast();
   const [services, setServices] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [serviceCenters, setServiceCenters] = useState([]);
@@ -60,7 +62,7 @@ const UpcomingServices = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newService.vehicleId || !newService.description || !newService.date) {
-      alert("Please fill in all fields.");
+      toast.warning("Please fill in all fields.");
       return;
     }
     try {
@@ -80,8 +82,9 @@ const UpcomingServices = () => {
         urgency: "info",
         provider: serviceCenters[0]?.name || ""
       });
+      toast.success("Service scheduled successfully!");
     } catch (err) {
-      alert(err.message || "Failed to schedule service task.");
+      toast.error(err.message || "Failed to schedule service task.");
     }
   };
 
@@ -89,8 +92,9 @@ const UpcomingServices = () => {
     try {
       await api.put(`/upcoming/${serviceId}/complete`);
       setServices(prev => prev.filter(s => s._id !== serviceId));
+      toast.success("Service marked as completed!");
     } catch (err) {
-      alert(err.message || "Failed to mark service as completed.");
+      toast.error(err.message || "Failed to mark service as completed.");
     }
   };
 

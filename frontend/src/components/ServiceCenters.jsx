@@ -4,8 +4,10 @@ import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const ServiceCenters = () => {
+  const toast = useToast();
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +44,7 @@ const ServiceCenters = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newCenter.name || !newCenter.location || !newCenter.contact) {
-      alert("Please fill in all required fields.");
+      toast.warning("Please fill in all required fields.");
       return;
     }
     try {
@@ -59,8 +61,9 @@ const ServiceCenters = () => {
         rating: "4.5",
         status: "Open"
       });
+      toast.success("Service center registered successfully!");
     } catch (err) {
-      alert(err.message || "Failed to register service center.");
+      toast.error(err.message || "Failed to register service center.");
     }
   };
 

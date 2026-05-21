@@ -5,8 +5,10 @@ import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const FuelConsumption = () => {
+  const toast = useToast();
   const [fuelLogs, setFuelLogs] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ const FuelConsumption = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newLog.vehicleId || !newLog.date || !newLog.liters || !newLog.cost || !newLog.mileage) {
-      alert("Please fill in all fields.");
+      toast.warning("Please fill in all fields.");
       return;
     }
     try {
@@ -76,8 +78,9 @@ const FuelConsumption = () => {
         cost: "",
         mileage: ""
       });
+      toast.success("Refueling details logged successfully!");
     } catch (err) {
-      alert(err.message || "Failed to log refueling details.");
+      toast.error(err.message || "Failed to log refueling details.");
     } finally {
       setSubmitting(false);
     }

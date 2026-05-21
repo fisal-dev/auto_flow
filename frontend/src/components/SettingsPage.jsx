@@ -4,8 +4,10 @@ import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const SettingsPage = () => {
+  const toast = useToast();
   const [settings, setSettings] = useState({
     notifications: true,
     reminderFrequency: "Weekly",
@@ -18,18 +20,52 @@ const SettingsPage = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      api.get("/user/settings"),
-      api.get("/user/profile")
-    ]).then(([settingsRes, profileRes]) => {
-      setSettings({
-        notifications: settingsRes.notifications !== undefined ? settingsRes.notifications : true,
-        reminderFrequency: settingsRes.reminderFrequency || "Weekly",
-        preferredServiceProvider: settingsRes.preferredServiceProvider || "",
-      });
-      setSubscriptionStatus(profileRes.subscriptionStatus || "free");
-    }).catch(err => console.error("Error loading settings:", err))
-      .finally(() => setLoading(false));
+    const queryParams = new URLSearchParams(window.location.search);
+    const paySuccess = queryParams.get("success") === "true";
+    const sessionId = queryParams.get("session_id");
+
+    const loadSettings = async () => {
+      try {
+        const [settingsRes, profileRes] = await Promise.all([
+          api.get("/user/settings"),
+          api.get("/user/profile")
+        ]);
+        setSettings({
+          notifications: settingsRes.notifications !== undefined ? settingsRes.notifications : true,
+          reminderFrequency: settingsRes.reminderFrequency || "Weekly",
+          preferredServiceProvider: settingsRes.preferredServiceProvider || "",
+        });
+        setSubscriptionStatus(profileRes.subscriptionStatus || "free");
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (paySuccess && sessionId) {
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setLoading(true);
+      api.post("/stripe/verify-session", { sessionId })
+        .then(res => {
+          if (res.success) {
+            setSubscriptionStatus("premium");
+            toast.success("Upgrade successful! Welcome to AutoFlow Premium.");
+          } else {
+            toast.warning("Payment verification pending or failed.");
+          }
+        })
+        .catch(err => {
+          console.error("Error verifying payment session:", err);
+          toast.error("Error verifying payment session.");
+        })
+        .finally(() => {
+          loadSettings();
+        });
+    } else {
+      loadSettings();
+    }
   }, []);
 
   const handleChange = (e) => {
@@ -67,11 +103,11 @@ const SettingsPage = () => {
       if (res.url) {
         window.location.href = res.url;
       } else {
-        alert("Failed to create Stripe payment session.");
+        toast.error("Failed to create Stripe payment session.");
       }
     } catch (err) {
       console.error("Error upgrading:", err);
-      alert(err.message || "Error creating Stripe session.");
+      toast.error(err.message || "Error creating Stripe session.");
     } finally {
       setUpgrading(false);
     }

@@ -290,7 +290,12 @@ const DashboardLayout = ({ children }) => {
                 <Menu className="w-4 h-4" />
               </button>
               <div className="flex items-center gap-2 text-sm text-slate-500">
-                <span className="text-slate-600 hidden sm:inline">AutoFlow</span>
+                <Link
+                  to="/"
+                  className="text-slate-600 hover:text-indigo-400 hidden sm:inline transition-colors duration-200"
+                >
+                  AutoFlow
+                </Link>
                 <ChevronRight className="w-3 h-3 hidden sm:inline" />
                 <span className="font-semibold text-slate-200">{pageTitle}</span>
               </div>

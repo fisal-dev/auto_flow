@@ -59,5 +59,6 @@ router.post("/service-centers", authMiddleware, serviceCenterController.createSe
 // Stripe routes
 router.post("/stripe/create-checkout-session", authMiddleware, stripeController.createCheckoutSession);
 router.post("/stripe/pay-service", authMiddleware, stripeController.payService);
+router.post("/stripe/verify-session", authMiddleware, stripeController.verifySession);
 
 module.exports = router;
