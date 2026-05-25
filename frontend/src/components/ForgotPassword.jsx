@@ -27,6 +27,8 @@ const ForgotPassword = () => {
       const res = await api.post("/user/forgot-password", { email });
       if (res && res.demoCode) {
         setDemoCode(res.demoCode);
+      } else {
+        setDemoCode("");
       }
       setStep(2);
     } catch (err) {

@@ -329,7 +329,7 @@
   }
 
   /* ── Min tap target ── */
-  button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+  button, a, [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }

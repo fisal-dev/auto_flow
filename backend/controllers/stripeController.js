@@ -23,6 +23,19 @@ const stripeController = {
         }
       }
 
+      let origin = process.env.FRONTEND_URL;
+      if (!origin) {
+        origin = req.get('origin') || req.headers.origin;
+        if (!origin && req.get('referer')) {
+          try {
+            const refUrl = new URL(req.get('referer'));
+            origin = refUrl.origin;
+          } catch (e) {}
+        }
+      }
+      if (!origin) origin = 'http://localhost:8080';
+      origin = origin.replace(/\/$/, '');
+
       const session = await stripe.checkout.sessions.create({
         customer: customerId || undefined,
         customer_email: customerId ? undefined : user.email,
@@ -44,8 +57,8 @@ const stripeController = {
           },
         ],
         mode: 'subscription',
-        success_url: `http://localhost:8080/settings?session_id={CHECKOUT_SESSION_ID}&success=true`,
-        cancel_url: `http://localhost:8080/settings?success=false`,
+        success_url: `${origin}/settings?session_id={CHECKOUT_SESSION_ID}&success=true`,
+        cancel_url: `${origin}/settings?success=false`,
         metadata: {
           userId: user._id.toString(),
           type: 'subscription'
@@ -67,6 +80,19 @@ const stripeController = {
 
       const user = await User.findById(req.user.id);
 
+      let origin = process.env.FRONTEND_URL;
+      if (!origin) {
+        origin = req.get('origin') || req.headers.origin;
+        if (!origin && req.get('referer')) {
+          try {
+            const refUrl = new URL(req.get('referer'));
+            origin = refUrl.origin;
+          } catch (e) {}
+        }
+      }
+      if (!origin) origin = 'http://localhost:8080';
+      origin = origin.replace(/\/$/, '');
+
       const session = await stripe.checkout.sessions.create({
         customer: user?.stripeCustomerId || undefined,
         customer_email: user?.stripeCustomerId ? undefined : user?.email,
@@ -85,8 +111,8 @@ const stripeController = {
           },
         ],
         mode: 'payment',
-        success_url: `http://localhost:8080/maintenance?success=true&session_id={CHECKOUT_SESSION_ID}&record_id=${record._id}`,
-        cancel_url: `http://localhost:8080/maintenance?success=false`,
+        success_url: `${origin}/maintenance?success=true&session_id={CHECKOUT_SESSION_ID}&record_id=${record._id}`,
+        cancel_url: `${origin}/maintenance?success=false`,
         metadata: {
           recordId: record._id.toString(),
           type: 'invoice'

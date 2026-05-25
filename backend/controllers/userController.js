@@ -257,19 +257,21 @@ const userController = {
 
       let emailSent = false;
       try {
-        await sendEmail({
+        const mailResult = await sendEmail({
           to: email,
           subject: 'AutoFlow - Password Reset Verification Code',
           html: emailHtml
         });
-        emailSent = true;
+        if (mailResult && mailResult.success !== false) {
+          emailSent = true;
+        }
       } catch (mailErr) {
         console.error('Real email dispatch failed, running console fallback:', mailErr.message);
       }
 
       res.json({
         message: 'Verification code sent to email',
-        demoCode: code,
+        demoCode: emailSent ? undefined : code,
         emailSent
       });
     } catch (err) {
