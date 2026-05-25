@@ -18,6 +18,20 @@ const ForgotPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Reset all fields when page is opened/reloaded (mounted)
+  React.useEffect(() => {
+    setEmail("");
+    setCode("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setStep(1);
+    setLoading(false);
+    setError("");
+    setDemoCode("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  }, []);
+
   const handleRequestCode = async (e) => {
     e.preventDefault();
     if (!email) return;

@@ -15,6 +15,17 @@ const SignUp = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Reset all fields when page is opened/reloaded (mounted)
+  React.useEffect(() => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setLoading(false);
+    setError("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  }, []);
+
   const handleSignUp = async (e) => {
     e.preventDefault();
 

@@ -7,14 +7,25 @@ import { api } from "../utils/api";
 
 const LoginPage = () => {
   const location = useLocation();
-  const [email, setEmail] = useState(localStorage.getItem("rememberedEmail") || "");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(location.state?.successMessage || "");
-  const [rememberMe, setRememberMe] = useState(!!localStorage.getItem("rememberedEmail"));
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Reset all fields when page is opened/reloaded (mounted)
+  React.useEffect(() => {
+    setEmail("");
+    setPassword("");
+    setLoading(false);
+    setError("");
+    setSuccess(location.state?.successMessage || "");
+    setRememberMe(false);
+    setShowPassword(false);
+  }, [location.pathname]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
