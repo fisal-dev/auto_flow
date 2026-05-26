@@ -62,7 +62,7 @@ const ComplaintHistory = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="premium-table">
+              <table className="premium-table min-w-[700px]">
                 <thead>
                   <tr>
                     <th className="pl-6">Vehicle</th>
@@ -73,34 +73,46 @@ const ComplaintHistory = () => {
                 </thead>
                 <tbody>
                   {complaints.map((item) => (
-                    <tr key={item._id}>
-                      <td className="pl-6">
-                        <div className="font-bold text-foreground flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
-                            <Car className="w-3 h-3 text-slate-400" />
+                    <React.Fragment key={item._id}>
+                      <tr className="border-b border-white/5">
+                        <td className="pl-6 py-4">
+                          <div className="font-bold text-foreground flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+                              <Car className="w-3 h-3 text-slate-400" />
+                            </div>
+                            {item.vehicleId ? (
+                              <Link to={`/vehicle/${item.vehicleId._id}`} className="hover:text-indigo-400 transition-colors">
+                                {item.vehicleId.make} {item.vehicleId.model}
+                              </Link>
+                            ) : (
+                              <span className="text-slate-400">Unknown Vehicle</span>
+                            )}
                           </div>
-                          {item.vehicleId ? (
-                            <Link to={`/vehicle/${item.vehicleId._id}`} className="hover:text-indigo-400 transition-colors">
-                              {item.vehicleId.make} {item.vehicleId.model}
-                            </Link>
-                          ) : (
-                            <span className="text-slate-400">Unknown Vehicle</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="font-semibold text-slate-300 max-w-md truncate" title={item.description}>
-                        {item.description}
-                      </td>
-                      <td className="text-slate-400">
-                        <span className="flex items-center gap-1.5">
-                          <CalendarClock className="w-3.5 h-3.5 text-indigo-400" />
-                          {new Date(item.date).toLocaleDateString()}
-                        </span>
-                      </td>
-                      <td className="pr-6">
-                        <Badge variant={item.status || "danger"} dot size="sm">{item.label || "Open"}</Badge>
-                      </td>
-                    </tr>
+                        </td>
+                        <td className="font-semibold text-slate-300 max-w-md py-4" title={item.description}>
+                          {item.description}
+                        </td>
+                        <td className="text-slate-400 py-4">
+                          <span className="flex items-center gap-1.5">
+                            <CalendarClock className="w-3.5 h-3.5 text-indigo-400" />
+                            {new Date(item.date).toLocaleDateString()}
+                          </span>
+                        </td>
+                        <td className="pr-6 py-4">
+                          <Badge variant={item.status || "danger"} dot size="sm">{item.label || "Open"}</Badge>
+                        </td>
+                      </tr>
+                      {item.response && (
+                        <tr className="bg-emerald-500/5">
+                          <td colSpan="4" className="pl-14 pr-6 py-3 border-b border-white/5 text-xs">
+                            <div className="flex gap-2 items-start text-slate-300 font-semibold">
+                              <span className="text-emerald-400 font-bold uppercase tracking-wider">Troubleshoot Response:</span>
+                              <span>{item.response}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

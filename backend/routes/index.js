@@ -1,64 +1,38 @@
 const express = require('express');
+const { upload } = require('../config/cloudinary');
+const uploadController = require('../controllers/uploadController');
 const userRouter = require('./userRouter');
-
-const vehicleController = require('../controllers/vehicleController');
-const dashboardController = require('../controllers/dashboardController');
-const maintenanceController = require('../controllers/maintenanceController');
-const upcomingController = require('../controllers/upcomingController');
-const fuelController = require('../controllers/fuelController');
-const complaintController = require('../controllers/complaintController');
-const notificationController = require('../controllers/notificationController');
-const serviceCenterController = require('../controllers/serviceCenterController');
-const stripeController = require('../controllers/stripeController');
+const adminRouter = require('./adminRouter');
+const managerRouter = require('./managerRouter');
+const ownerRouter = require('./ownerRouter');
+const storeRouter = require('./storeRouter');
+const vehicleRoutes = require('./vehicleRoutes');
+const maintenanceTaskRoutes = require('./maintenanceTaskRoutes');
+const complaintRoutes = require('./complaintRoutes');
+const orderRouter = require('./orderRouter');
 
 const authMiddleware = require('../middleware/authMiddleware');
+const dashboardController = require('../controllers/dashboardController');
 
 const router = express.Router();
 
-// User routes
+// Backward-compatible userRouter
 router.use("/user", userRouter);
+
+// Upload Route
+router.post('/upload', authMiddleware, upload.single('file'), uploadController.uploadFile);
+
+// Spec-compliant role & resource routers
+router.use("/admin", adminRouter);
+router.use("/manager", managerRouter);
+router.use("/owner", ownerRouter);
+router.use("/store", storeRouter);
+router.use("/vehicle", vehicleRoutes);
+router.use("/maintenance-task", maintenanceTaskRoutes);
+router.use("/complaint", complaintRoutes);
+router.use("/order", orderRouter);
 
 // Dashboard routes
 router.get("/dashboard", authMiddleware, dashboardController.getDashboardData);
-
-// Vehicle routes
-router.get("/vehicles", authMiddleware, vehicleController.getVehicles);
-router.get("/vehicles/search", authMiddleware, vehicleController.searchVehicle);
-router.post("/vehicles/quick-register", authMiddleware, vehicleController.quickRegister);
-router.post("/vehicles", authMiddleware, vehicleController.createVehicle);
-router.get("/vehicles/:id", authMiddleware, vehicleController.getVehicleById);
-router.put("/vehicles/:id", authMiddleware, vehicleController.updateVehicle);
-router.delete("/vehicles/:id", authMiddleware, vehicleController.deleteVehicle);
-
-// Maintenance routes
-router.get("/maintenance", authMiddleware, maintenanceController.getMaintenanceRecords);
-router.post("/maintenance", authMiddleware, maintenanceController.createMaintenanceRecord);
-
-// Upcoming Service routes
-router.get("/upcoming", authMiddleware, upcomingController.getUpcomingServices);
-router.post("/upcoming", authMiddleware, upcomingController.createUpcomingService);
-router.put("/upcoming/:id/complete", authMiddleware, upcomingController.completeUpcomingService);
-
-// Fuel routes
-router.get("/fuel", authMiddleware, fuelController.getFuelLogs);
-router.post("/fuel", authMiddleware, fuelController.createFuelLog);
-
-// Complaint routes
-router.get("/complaints", authMiddleware, complaintController.getComplaints);
-router.post("/complaints", authMiddleware, complaintController.createComplaint);
-
-// Notification routes
-router.get("/notifications", authMiddleware, notificationController.getNotifications);
-router.put("/notifications/:id/read", authMiddleware, notificationController.markRead);
-router.delete("/notifications", authMiddleware, notificationController.clearAll);
-
-// Service Center routes
-router.get("/service-centers", authMiddleware, serviceCenterController.getServiceCenters);
-router.post("/service-centers", authMiddleware, serviceCenterController.createServiceCenter);
-
-// Stripe routes
-router.post("/stripe/create-checkout-session", authMiddleware, stripeController.createCheckoutSession);
-router.post("/stripe/pay-service", authMiddleware, stripeController.payService);
-router.post("/stripe/verify-session", authMiddleware, stripeController.verifySession);
 
 module.exports = router;

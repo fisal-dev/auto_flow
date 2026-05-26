@@ -10,6 +10,7 @@ const dashboardRoutes = [
   "/fuel-consumption", "/performance-analytics",
   "/report-complaint", "/complaint-history",
   "/profile", "/settings", "/notifications", "/add-vehicle",
+  "/admin", "/team-management", "/garage-console",
 ];
 
 const hideFooterRoutes = [

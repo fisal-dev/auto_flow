@@ -1,20 +1,37 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const router = require('./routes');
 const stripeController = require('./controllers/stripeController');
 
 const app = express();
 
+// Apply Helmet Security Headers
+app.use(helmet());
+
+// Apply Rate Limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // Limit each IP to 300 requests per 15 mins for development/testing flexibility
+  message: { message: 'Too many requests from this IP, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
+
 // Connect to Database
 connectDB();
 
 // CORS Settings
 const allowedOrigins = [
+  process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
   'http://localhost:8080',
   'http://localhost:5173',
+  'http://localhost:3000',
 ].filter(Boolean);
 
 app.use(cors({

@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
   notifications: { type: Boolean, default: true },
   subscriptionStatus: { type: String, enum: ['free', 'premium'], default: 'free' },
   stripeCustomerId: { type: String, default: '' },
-  role: { type: String, enum: ['customer', 'owner', 'manager'], default: 'customer' },
+  role: { type: String, enum: ['customer', 'owner', 'manager', 'admin'], default: 'customer' },
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   assignedGarages: [{ type: String, default: [] }],
   resetPasswordCode: { type: String, default: null },

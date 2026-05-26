@@ -33,7 +33,7 @@ const maintenanceController = {
 
   createMaintenanceRecord: async (req, res) => {
     try {
-      const { vehicleId, date, service, cost, provider, status, label } = req.body;
+      const { vehicleId, date, service, cost, provider, status, label, attachment } = req.body;
       
       // Verify vehicle exists
       const vehicle = await Vehicle.findById(vehicleId);
@@ -68,7 +68,8 @@ const maintenanceController = {
         provider,
         status: status || 'success',
         label: label || 'Completed',
-        paymentStatus: (cost && cost > 0) ? 'unpaid' : 'paid'
+        paymentStatus: (cost && cost > 0) ? 'unpaid' : 'paid',
+        attachment: attachment || ''
       });
 
       await record.save();

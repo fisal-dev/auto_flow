@@ -447,9 +447,15 @@ const userController = {
 
   getManagers: async (req, res) => {
     try {
+      if (req.user.role === 'manager') {
+        // Manager sees only their own record
+        const self = await User.findById(req.user.id).select('-password');
+        return res.json(self ? [self] : []);
+      }
       if (req.user.role !== 'owner') {
         return res.status(403).json({ message: 'Access denied: Only owners can manage team managers' });
       }
+      // Owner sees all managers they created
       const managers = await User.find({ ownerId: req.user.id, role: 'manager' }).select('-password');
       res.json(managers);
     } catch (err) {

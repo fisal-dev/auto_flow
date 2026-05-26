@@ -20,6 +20,7 @@ const UserProfile = () => {
     email: "",
     phone: "",
     notifications: true,
+    role: "customer"
   });
 
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ const UserProfile = () => {
           email: res.email || "",
           phone: res.phone || "",
           notifications: res.notifications !== undefined ? res.notifications : true,
+          role: res.role || "customer"
         });
       })
       .catch(err => console.error("Error fetching profile:", err))
@@ -95,9 +97,14 @@ const UserProfile = () => {
                </div>
              </div>
              <div className="text-center sm:text-left">
-               <h2 className="text-2xl font-extrabold text-foreground">{profile.name}</h2>
-               <div className="flex items-center gap-2 mt-1 justify-center sm:justify-start text-emerald-400 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded-md w-max">
-                 <ShieldCheck className="w-3.5 h-3.5" /> Verified Account
+               <h2 className="text-2xl font-extrabold text-foreground capitalize">{profile.name}</h2>
+               <div className="flex flex-wrap items-center gap-2 mt-1.5 justify-center sm:justify-start">
+                 <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-extrabold bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider border border-emerald-500/20">
+                   <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                 </div>
+                 <div className="text-indigo-400 text-[10px] font-extrabold bg-indigo-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider border border-indigo-500/20">
+                   {profile.role === 'owner' ? 'Owner / Admin' : profile.role}
+                 </div>
                </div>
              </div>
           </div>
@@ -160,18 +167,6 @@ const UserProfile = () => {
                 />
               </div>
             </div>
-
-            {/* Enable Notifications checkbox */}
-            <label className="flex items-center gap-3 cursor-pointer group text-sm text-slate-400 mt-2 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-              <input
-                type="checkbox"
-                name="notifications"
-                checked={profile.notifications}
-                onChange={handleChange}
-                className="w-5 h-5 rounded bg-background/70 border-white/10 text-indigo-500 focus:ring-indigo-500/50 focus:ring-offset-background"
-              />
-              <span className="group-hover:text-foreground transition-colors font-semibold">Enable critical system alerts via SMS/Email</span>
-            </label>
 
             {success && (
               <div className="flex items-center gap-2 text-emerald-400 text-sm font-semibold justify-center bg-emerald-500/10 border border-emerald-500/20 py-3 rounded-xl animate-scale-in">

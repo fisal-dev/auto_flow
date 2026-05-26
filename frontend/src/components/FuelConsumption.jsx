@@ -243,7 +243,7 @@ const FuelConsumption = () => {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="premium-table">
+                <table className="premium-table min-w-[600px]">
                   <thead>
                     <tr>
                       <th className="pl-6">Vehicle</th>

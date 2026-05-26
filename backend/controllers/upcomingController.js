@@ -126,33 +126,36 @@ const upcomingController = {
         }
       }
 
-      service.status = 'completed';
+      const status = req.body.status || 'completed';
+      service.status = status;
       await service.save();
 
-      // Log it to maintenance history too
-      const record = new MaintenanceRecord({
-        vehicleId: service.vehicleId,
-        date: new Date(),
-        service: service.description,
-        cost: 0,
-        provider: service.provider || 'Scheduled Maintenance',
-        status: 'success',
-        label: 'Completed',
-        paymentStatus: 'paid'
-      });
-      await record.save();
+      if (status === 'completed') {
+        // Log it to maintenance history too
+        const record = new MaintenanceRecord({
+          vehicleId: service.vehicleId,
+          date: new Date(),
+          service: service.description,
+          cost: 0,
+          provider: service.provider || 'Scheduled Maintenance',
+          status: 'success',
+          label: 'Completed',
+          paymentStatus: 'paid'
+        });
+        await record.save();
 
-      // Create completion notification for the customer
-      try {
-        const Notification = require('../models/Notification');
-        await new Notification({
-          userId: vehicle.userId,
-          message: `Service completed successfully for your ${vehicle.make} ${vehicle.model}: "${service.description}". Logged to maintenance history.`,
-          type: 'info',
-          color: 'indigo'
-        }).save();
-      } catch (notifErr) {
-        console.error('Failed to create service completion notification:', notifErr.message);
+        // Create completion notification for the customer
+        try {
+          const Notification = require('../models/Notification');
+          await new Notification({
+            userId: vehicle.userId,
+            message: `Service completed successfully for your ${vehicle.make} ${vehicle.model}: "${service.description}". Logged to maintenance history.`,
+            type: 'info',
+            color: 'indigo'
+          }).save();
+        } catch (notifErr) {
+          console.error('Failed to create service completion notification:', notifErr.message);
+        }
       }
 
       res.json(service);

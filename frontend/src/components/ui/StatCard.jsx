@@ -57,15 +57,21 @@ const StatCard = ({
 }) => {
   const theme = colorMap[color] || colorMap.indigo;
 
+  const isTrendObject = trend && typeof trend === "object";
+  const trendText = isTrendObject ? trend.value : trend;
+  const resolvedTrendType = isTrendObject
+    ? (trend.positive ? "up" : "down")
+    : trendType;
+
   const TrendIcon =
-    trendType === "up" ? ArrowUpRight :
-    trendType === "down" ? ArrowDownRight :
+    resolvedTrendType === "up" ? ArrowUpRight :
+    resolvedTrendType === "down" ? ArrowDownRight :
     Minus;
 
   const trendColor =
-    trendType === "up"   ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/25" :
-    trendType === "down" ? "text-rose-400 bg-rose-500/10 border-rose-500/25" :
-                           "text-slate-400 bg-slate-500/10 border-slate-500/25";
+    resolvedTrendType === "up"   ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/25" :
+    resolvedTrendType === "down" ? "text-rose-400 bg-rose-500/10 border-rose-500/25" :
+                                   "text-slate-400 bg-slate-500/10 border-slate-500/25";
 
   return (
     <motion.div
@@ -106,11 +112,11 @@ const StatCard = ({
         )}
       </div>
 
-      {trend && (
+      {trendText && (
         <div className="flex items-center gap-2 mt-4 relative z-10">
           <span className={`inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-md border ${trendColor}`}>
             <TrendIcon className="w-3 h-3" />
-            {trend}
+            {trendText}
           </span>
           <span className="text-xs text-slate-600 font-medium">vs last month</span>
         </div>

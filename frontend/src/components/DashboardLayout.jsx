@@ -9,15 +9,17 @@ import {
 } from "lucide-react";
 
 const getNavGroups = (role) => {
-  if (role === 'owner') {
+  if (role === 'admin' || role === 'owner') {
     return [
       {
-        label: "Business",
+        label: "Administration",
         items: [
-          { label: "Dashboard",    path: "/dashboard",           icon: LayoutDashboard },
-          { label: "Garage Console",path: "/garage-console",      icon: Car },
-          { label: "Team Portal",   path: "/team-management",     icon: Users },
-          { label: "Service Centers",path: "/service-centers",    icon: MapPin },
+          { label: "Admin Dashboard", path: "/admin/dashboard",   icon: LayoutDashboard },
+          { label: "User Directory",  path: "/admin/users",       icon: Users },
+          { label: "Complaints Support", path: "/admin/complaints", icon: AlertCircle },
+          { label: "Service Stations",path: "/admin/stores",      icon: MapPin },
+          { label: "Garage Console",  path: "/garage-console",    icon: Car },
+          { label: "Team Portal",     path: "/team-management",   icon: Users },
         ],
       },
       {
@@ -33,16 +35,18 @@ const getNavGroups = (role) => {
       {
         label: "Business",
         items: [
-          { label: "Dashboard",    path: "/dashboard",           icon: LayoutDashboard },
-          { label: "Garage Console",path: "/garage-console",      icon: Car },
-          { label: "Service Centers",path: "/service-centers",    icon: MapPin },
+          { label: "Dashboard",      path: "/dashboard",           icon: LayoutDashboard },
+          { label: "Garage Console", path: "/garage-console",      icon: Car },
+          { label: "Service Centers",path: "/service-centers",     icon: MapPin },
+          { label: "Complaints",     path: "/admin/complaints",    icon: AlertCircle },
+          { label: "Team Portal",    path: "/team-management",     icon: Users },
         ],
       },
       {
         label: "Account",
         items: [
-          { label: "Profile",   path: "/profile",  icon: User },
-          { label: "Settings",  path: "/settings", icon: Settings },
+          { label: "Profile",  path: "/profile",  icon: User },
+          { label: "Settings", path: "/settings", icon: Settings },
         ],
       },
     ];
@@ -120,14 +124,28 @@ const DashboardLayout = ({ children }) => {
   
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const role = user.role || 'customer';
-  const name = user.name || 'User';
+  const rawName = user.name || 'User';
   
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "U";
+  const formatName = (str) => {
+    if (!str) return "";
+    return str
+      .trim()
+      .split(/\s+/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  };
+
+  const getInitials = (n) => {
+    if (!n) return "U";
+    const parts = n.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  };
+
+  const name = formatName(rawName);
+  const initials = getInitials(rawName);
 
   const navGroups = getNavGroups(role);
 
@@ -292,7 +310,7 @@ const DashboardLayout = ({ children }) => {
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <Link
                   to="/"
-                  className="text-slate-600 hover:text-indigo-400 hidden sm:inline transition-colors duration-200"
+                  className="inline-link text-slate-600 hover:text-indigo-400 hidden sm:inline transition-colors duration-200"
                 >
                   AutoFlow
                 </Link>

@@ -13,6 +13,8 @@ export default {
         background: 'var(--bg-base)',
         surface: 'var(--bg-surface)',
         foreground: 'var(--foreground)',
+        primary: 'var(--primary)',
+        'primary-foreground': 'var(--primary-foreground)',
         indigo: {
           50: 'var(--accent-50)',
           100: 'var(--accent-100)',

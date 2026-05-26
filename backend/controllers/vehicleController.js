@@ -37,7 +37,7 @@ const vehicleController = {
 
   createVehicle: async (req, res) => {
     try {
-      const { make, model, year, vin, registration, mileage } = req.body;
+      const { make, model, year, vin, registration, mileage, image } = req.body;
       const vehicle = new Vehicle({
         make,
         model,
@@ -46,7 +46,8 @@ const vehicleController = {
         registration,
         mileage: mileage || '0 km',
         userId: req.user.id,
-        status: 'success'
+        status: 'success',
+        image: image || ''
       });
       await vehicle.save();
 

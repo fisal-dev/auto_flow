@@ -20,6 +20,9 @@ const ServiceCenters = () => {
     status: "Open"
   });
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isManager = user.role === "manager" || user.role === "owner" || user.role === "admin";
+
   const loadCenters = async () => {
     try {
       setLoading(true);
@@ -77,9 +80,11 @@ const ServiceCenters = () => {
             <h1 className="section-header">Service Centers</h1>
             <p className="section-subheader">Find and contact authorized fleet servicing vendors</p>
           </div>
-          <Button variant="primary" icon={Plus} onClick={() => setIsModalOpen(true)}>
-            Register Center
-          </Button>
+          {isManager && (
+            <Button variant="primary" icon={Plus} onClick={() => setIsModalOpen(true)}>
+              Register Center
+            </Button>
+          )}
         </div>
 
         {/* Center Grid */}
@@ -93,7 +98,11 @@ const ServiceCenters = () => {
               <MapPin className="w-8 h-8" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">No service hubs registered</h3>
-            <p className="text-slate-400 text-sm">Start by registering your first servicing vendor.</p>
+            <p className="text-slate-400 text-sm">
+              {isManager 
+                ? "Start by registering your first servicing vendor." 
+                : "Authorized vendors will appear here once registered."}
+            </p>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -148,7 +157,7 @@ const ServiceCenters = () => {
             <Card variant="bordered" className="w-full max-w-md bg-surface/95 border-white/10 p-6 shadow-2xl relative animate-scale-up">
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>

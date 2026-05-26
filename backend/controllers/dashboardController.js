@@ -3,6 +3,8 @@ const MaintenanceRecord = require('../models/MaintenanceRecord');
 const UpcomingService = require('../models/UpcomingService');
 const FuelLog = require('../models/FuelLog');
 const User = require('../models/User');
+const ServiceCenter = require('../models/ServiceCenter');
+const Complaint = require('../models/Complaint');
 
 const dashboardController = {
   getDashboardData: async (req, res) => {
@@ -259,6 +261,58 @@ const dashboardController = {
           recentRecords
         });
       }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
+
+  getAdminDashboardData: async (req, res) => {
+    try {
+      const totalUsers = await User.countDocuments();
+      const totalStores = await ServiceCenter.countDocuments();
+      const totalComplaints = await Complaint.countDocuments({ status: { $ne: 'success' } });
+      const totalVehicles = await Vehicle.countDocuments();
+
+      const recentUsers = await User.find().sort({ createdAt: -1 }).limit(3);
+      const recentComplaints = await Complaint.find().populate('vehicleId', 'make model').sort({ createdAt: -1 }).limit(3);
+      const recentStores = await ServiceCenter.find().sort({ createdAt: -1 }).limit(2);
+
+      const recentActivity = [];
+      recentUsers.forEach(u => {
+        recentActivity.push({
+          id: `u-${u._id}`,
+          type: 'user',
+          text: `User registered: ${u.email}`,
+          time: u.createdAt
+        });
+      });
+      recentComplaints.forEach(c => {
+        recentActivity.push({
+          id: `c-${c._id}`,
+          type: 'complaint',
+          text: `Complaint: ${c.description}`,
+          time: c.createdAt
+        });
+      });
+      recentStores.forEach(s => {
+        recentActivity.push({
+          id: `s-${s._id}`,
+          type: 'store',
+          text: `Service hub registered: ${s.name}`,
+          time: s.createdAt
+        });
+      });
+
+      recentActivity.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+      res.json({
+        totalUsers,
+        totalStores,
+        totalComplaints,
+        totalVehicles,
+        recentActivity: recentActivity.slice(0, 5)
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Server error' });

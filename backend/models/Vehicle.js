@@ -8,6 +8,7 @@ const VehicleSchema = new mongoose.Schema({
   registration: { type: String, required: true },
   status: { type: String, enum: ['success', 'warning', 'danger'], default: 'success' },
   mileage: { type: String, default: '0 km' },
+  image: { type: String, default: '' },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 

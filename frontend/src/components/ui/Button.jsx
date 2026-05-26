@@ -24,7 +24,7 @@ const Button = ({
 
   const variants = {
     primary: [
-      "bg-indigo-600 text-white font-semibold",
+      "bg-indigo-600 text-primary-foreground font-semibold",
       "border border-indigo-500/60",
       "shadow-[0_0_20px_rgba(var(--accent-rgb),0.25)]",
       "hover:bg-indigo-500 hover:shadow-[0_0_30px_rgba(var(--accent-rgb),0.4)]",

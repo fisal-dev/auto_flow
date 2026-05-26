@@ -645,3 +645,7 @@
   border-radius: 9999px;
   flex-shrink: 0;
 }
+
+.text-primary-foreground {
+  color: var(--primary-foreground) !important;
+}

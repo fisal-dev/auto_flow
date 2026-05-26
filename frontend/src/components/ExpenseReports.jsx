@@ -182,7 +182,7 @@ const ExpenseReports = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="premium-table">
+              <table className="premium-table min-w-[650px]">
                 <thead>
                   <tr>
                     <th className="pl-6">Vehicle</th>

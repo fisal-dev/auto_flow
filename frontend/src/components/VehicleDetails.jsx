@@ -208,7 +208,7 @@ const VehicleDetails = () => {
                   {serviceHistory.length === 0 ? (
                     <p className="text-slate-500 text-sm p-6">No service history records logged yet.</p>
                   ) : (
-                    <table className="premium-table">
+                    <table className="premium-table min-w-[500px]">
                       <thead>
                         <tr>
                           <th className="pl-6">Service</th>
@@ -278,7 +278,7 @@ const VehicleDetails = () => {
                 {serviceHistory.length === 0 ? (
                   <p className="text-slate-500 text-sm p-6">No service history records logged yet.</p>
                 ) : (
-                  <table className="premium-table">
+                  <table className="premium-table min-w-[600px]">
                     <thead>
                       <tr>
                         <th className="pl-6">Service</th>
@@ -322,7 +322,7 @@ const VehicleDetails = () => {
                 {fuelLog.length === 0 ? (
                   <p className="text-slate-500 text-sm p-6">No fuel logs logged yet.</p>
                 ) : (
-                  <table className="premium-table">
+                  <table className="premium-table min-w-[600px]">
                     <thead>
                       <tr>
                         <th className="pl-6">Refuel Date</th>

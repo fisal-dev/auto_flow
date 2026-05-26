@@ -14,6 +14,8 @@ const AddVehicle = () => {
     vin: "",
     registrationNumber: "",
   });
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -22,6 +24,38 @@ const AddVehicle = () => {
 
   const handleChange = (e) => {
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
+  };
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true);
+    setError("");
+    try {
+      // Find API base url or fall back
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+      const res = await fetch(`${apiBase}/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setImageUrl(data.url);
+      } else {
+        setError(data.message || "Failed to upload image");
+      }
+    } catch (err) {
+      setError("Failed to upload image. Server connection error.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleNext = () => setStep(step + 1);
@@ -38,6 +72,7 @@ const AddVehicle = () => {
         year: Number(vehicle.year),
         vin: vehicle.vin,
         registration: vehicle.registrationNumber,
+        image: imageUrl
       });
       setCreatedId(res._id);
       setStep(3); // Success step
@@ -193,6 +228,29 @@ const AddVehicle = () => {
                       required
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Vehicle Photo (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUpload}
+                    className="input-field py-2 bg-white/5"
+                  />
+                  {uploading && <p className="text-xs text-indigo-400 font-semibold animate-pulse">Uploading photo to Cloudinary...</p>}
+                  {imageUrl && (
+                    <div className="mt-2 w-32 h-20 rounded-lg overflow-hidden border border-white/10 relative">
+                      <img src={imageUrl} alt="Uploaded Vehicle" className="w-full h-full object-cover" />
+                      <button 
+                        type="button" 
+                        onClick={() => setImageUrl("")}
+                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-rose-500 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {error && (

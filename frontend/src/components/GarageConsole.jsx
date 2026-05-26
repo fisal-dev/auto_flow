@@ -15,6 +15,8 @@ const GarageConsole = () => {
   const [loading, setLoading] = useState(false);
   const [allGarages, setAllGarages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [taskFilter, setTaskFilter] = useState("all");
   
   // Modals state
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
@@ -48,7 +50,26 @@ const GarageConsole = () => {
     customerPhone: ""
   });
 
-  // Load available garages/workshops
+  const fetchTasks = async () => {
+    try {
+      const data = await api.get("/maintenance-task/upcoming");
+      setTasks(data);
+    } catch (err) {
+      console.error("Failed to load tasks:", err);
+    }
+  };
+
+  const handleUpdateStatus = async (taskId, newStatus) => {
+    try {
+      await api.put(`/maintenance-task/upcoming/${taskId}/complete`, { status: newStatus });
+      toast.success(`Task status updated to ${newStatus}`);
+      fetchTasks();
+    } catch (err) {
+      toast.error(err.message || "Failed to update task");
+    }
+  };
+
+  // Load available garages/workshops and tasks
   useEffect(() => {
     const fetchGarages = async () => {
       try {
@@ -59,6 +80,7 @@ const GarageConsole = () => {
       }
     };
     fetchGarages();
+    fetchTasks();
   }, []);
 
   // Determine selectable provider names
@@ -307,13 +329,74 @@ const GarageConsole = () => {
           )}
         </div>
 
+        {/* Active/Upcoming Service Tasks */}
+        <div className="max-w-3xl mx-auto mt-8 mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+              <Wrench className="w-5 h-5 text-indigo-400" /> Active Maintenance Tasks
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {['all', 'pending', 'in-progress', 'completed'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setTaskFilter(status)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
+                    taskFilter === status 
+                      ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' 
+                      : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {tasks
+              .filter(t => taskFilter === 'all' || t.status === taskFilter)
+              .map(t => (
+                <Card key={t._id} variant="bordered" className="bg-surface/80 p-4 flex justify-between items-center gap-4">
+                  <div>
+                    <h3 className="font-bold text-slate-200">{t.description}</h3>
+                    <p className="text-xs text-slate-400">
+                      Vehicle: <span className="font-semibold text-slate-300">{t.vehicleId ? `${t.vehicleId.make} ${t.vehicleId.model} (${t.vehicleId.registration})` : 'N/A'}</span>
+                    </p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">Scheduled Date: {new Date(t.date).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={t.status === 'completed' ? 'success' : t.status === 'in-progress' ? 'warning' : 'secondary'}>
+                      {t.status}
+                    </Badge>
+                    {t.status === 'pending' && (
+                      <Button variant="secondary" size="sm" onClick={() => handleUpdateStatus(t._id, 'in-progress')}>
+                        Start Task
+                      </Button>
+                    )}
+                    {t.status === 'in-progress' && (
+                      <Button variant="primary" size="sm" onClick={() => handleUpdateStatus(t._id, 'completed')}>
+                        Complete Task
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))}
+
+            {tasks.filter(t => taskFilter === 'all' || t.status === taskFilter).length === 0 && (
+              <Card variant="bordered" className="p-6 text-center text-slate-500 bg-surface/50 font-bold">
+                No tasks match current filter.
+              </Card>
+            )}
+          </div>
+        </div>
+
         {/* Modal: Log Service Ticket */}
         {isLogModalOpen && vehicle && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
             <Card variant="bordered" className="w-full max-w-md bg-surface/95 border-white/10 p-6 shadow-2xl relative animate-scale-up">
               <button 
                 onClick={() => setIsLogModalOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -431,7 +514,7 @@ const GarageConsole = () => {
             <Card variant="bordered" className="w-full max-w-lg bg-surface/95 border-white/10 p-6 shadow-2xl relative animate-scale-up max-h-[90vh] overflow-y-auto custom-scrollbar">
               <button 
                 onClick={() => setIsQuickRegisterOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>

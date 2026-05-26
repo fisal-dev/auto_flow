@@ -4,8 +4,14 @@ const Vehicle = require('../models/Vehicle');
 const fuelController = {
   getFuelLogs: async (req, res) => {
     try {
-      const vehicles = await Vehicle.find({ userId: req.user.id });
-      const vehicleIds = vehicles.map(v => v._id);
+      let vehicleIds;
+      if (req.user.role === 'customer') {
+        const vehicles = await Vehicle.find({ userId: req.user.id });
+        vehicleIds = vehicles.map(v => v._id);
+      } else {
+        const vehicles = await Vehicle.find({});
+        vehicleIds = vehicles.map(v => v._id);
+      }
 
       const logs = await FuelLog.find({ vehicleId: { $in: vehicleIds } })
         .populate('vehicleId', 'make model registration')
@@ -21,7 +27,11 @@ const fuelController = {
   createFuelLog: async (req, res) => {
     try {
       const { vehicleId, date, liters, cost, mileage } = req.body;
-      const vehicle = await Vehicle.findOne({ _id: vehicleId, userId: req.user.id });
+      const query = { _id: vehicleId };
+      if (req.user.role === 'customer') {
+        query.userId = req.user.id;
+      }
+      const vehicle = await Vehicle.findOne(query);
       if (!vehicle) {
         return res.status(404).json({ message: 'Vehicle not found or unauthorized' });
       }

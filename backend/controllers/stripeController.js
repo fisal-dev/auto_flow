@@ -23,7 +23,7 @@ const stripeController = {
         }
       }
 
-      let origin = process.env.FRONTEND_URL;
+      let origin = process.env.CLIENT_URL || process.env.FRONTEND_URL;
       if (!origin) {
         origin = req.get('origin') || req.headers.origin;
         if (!origin && req.get('referer')) {
@@ -80,7 +80,7 @@ const stripeController = {
 
       const user = await User.findById(req.user.id);
 
-      let origin = process.env.FRONTEND_URL;
+      let origin = process.env.CLIENT_URL || process.env.FRONTEND_URL;
       if (!origin) {
         origin = req.get('origin') || req.headers.origin;
         if (!origin && req.get('referer')) {
@@ -191,28 +191,11 @@ const stripeController = {
       event = stripe.webhooks.constructEvent(
         rawBody,
         sig,
-        process.env.STRIPE_WEBHOOK_SECRET || 'whsec_1234567890abcdef1234567890abcdef'
+        process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
-      // Fallback for simulation / mock testing when webhook signature can't be verified
-      let parsedBody;
-      if (req.body) {
-        if (Buffer.isBuffer(req.body)) {
-          try {
-            parsedBody = JSON.parse(req.body.toString());
-          } catch (e) {
-            console.error('Error parsing webhook buffer:', e.message);
-          }
-        } else if (typeof req.body === 'object') {
-          parsedBody = req.body;
-        }
-      }
-      if (parsedBody && parsedBody.type) {
-        event = parsedBody;
-      } else {
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-      }
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     if (event.type === 'checkout.session.completed') {

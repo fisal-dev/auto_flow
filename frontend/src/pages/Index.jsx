@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "../hooks/useTheme";
 import { api } from "../utils/api";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 // Component Imports
 import Home from "../components/Home";
@@ -32,6 +33,12 @@ import CookiePolicy from "../components/CookiePolicy";
 import ManagerManagement from "../components/ManagerManagement";
 import GarageConsole from "../components/GarageConsole";
 
+// Admin Portal Imports
+import AdminDashboard from "../components/AdminDashboard";
+import AdminUserManagement from "../components/AdminUserManagement";
+import AdminComplaintResolution from "../components/AdminComplaintResolution";
+import AdminStoreManagement from "../components/AdminStoreManagement";
+
 // Fallback Page
 import NotFound from "./NotFound";
 
@@ -45,7 +52,6 @@ const IndexPage = () => {
       const deviceToken = localStorage.getItem("rememberDeviceToken");
       const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
-      // Only attempt auto-login if they have a deviceToken but are not actively flagged as logged in
       if (deviceToken && !isLoggedIn) {
         setCheckingSession(true);
         try {
@@ -53,8 +59,7 @@ const IndexPage = () => {
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("token", res.token);
           localStorage.setItem("user", JSON.stringify(res.user));
-          
-          // Send to dashboard if loading home/login/signup, otherwise keep current path
+
           if (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/signup") {
             navigate("/dashboard");
           } else {
@@ -68,9 +73,9 @@ const IndexPage = () => {
         }
       }
     };
-    
+
     autoLogin();
-  }, []); // Run once on application mount
+  }, []);
 
   if (checkingSession) {
     return (
@@ -89,40 +94,48 @@ const IndexPage = () => {
         <Navbar />
         <div className="flex-grow">
           <Routes>
+            {/* ── Public routes ──────────────────────────────────────────── */}
             <Route path="/" element={<Home />} />
-            
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/team-management" element={<ManagerManagement />} />
-            <Route path="/garage-console" element={<GarageConsole />} />
-
-            <Route path="/vehicles" element={<VehicleList />} />
-            <Route path="/vehicle/:id" element={<VehicleDetails />} />
-            <Route path="/add-vehicle" element={<AddVehicle />} />
-
-            <Route path="/maintenance-records" element={<Maintenance />} />
-            <Route path="/upcoming-services" element={<UpcomingServices />} />
-            <Route path="/service-centers" element={<ServiceCenters />} />
-
-            <Route path="/expense-reports" element={<ExpenseReports />} />
-            <Route path="/fuel-consumption" element={<FuelConsumption />} />
-            <Route path="/performance-analytics" element={<PerformanceAnalytics />} />
-
-            <Route path="/report-complaint" element={<Report />} />
-            <Route path="/complaint-history" element={<ComplaintHistory />} />
-
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
 
-            {/* Fallback Wildcard Catch */}
+            {/* ── All logged-in users ─────────────────────────────────────── */}
+            <Route path="/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+            <Route path="/profile"       element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+            <Route path="/settings"      element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/service-centers" element={<ProtectedRoute><ServiceCenters /></ProtectedRoute>} />
+
+            {/* ── Customer-only routes ────────────────────────────────────── */}
+            <Route path="/vehicles"            element={<ProtectedRoute roles={["customer"]}><VehicleList /></ProtectedRoute>} />
+            <Route path="/vehicle/:id"         element={<ProtectedRoute roles={["customer"]}><VehicleDetails /></ProtectedRoute>} />
+            <Route path="/add-vehicle"         element={<ProtectedRoute roles={["customer"]}><AddVehicle /></ProtectedRoute>} />
+            <Route path="/maintenance-records" element={<ProtectedRoute roles={["customer"]}><Maintenance /></ProtectedRoute>} />
+            <Route path="/upcoming-services"   element={<ProtectedRoute roles={["customer"]}><UpcomingServices /></ProtectedRoute>} />
+            <Route path="/expense-reports"     element={<ProtectedRoute roles={["customer"]}><ExpenseReports /></ProtectedRoute>} />
+            <Route path="/fuel-consumption"    element={<ProtectedRoute roles={["customer"]}><FuelConsumption /></ProtectedRoute>} />
+            <Route path="/performance-analytics" element={<ProtectedRoute roles={["customer"]}><PerformanceAnalytics /></ProtectedRoute>} />
+            <Route path="/report-complaint"    element={<ProtectedRoute roles={["customer"]}><Report /></ProtectedRoute>} />
+            <Route path="/complaint-history"   element={<ProtectedRoute roles={["customer"]}><ComplaintHistory /></ProtectedRoute>} />
+
+            {/* ── Manager + Owner routes ──────────────────────────────────── */}
+            <Route path="/garage-console"  element={<ProtectedRoute roles={["manager", "owner"]}><GarageConsole /></ProtectedRoute>} />
+            <Route path="/team-management" element={<ProtectedRoute roles={["manager", "owner"]}><ManagerManagement /></ProtectedRoute>} />
+
+            {/* ── Manager + Owner + Admin ─────────────────────────────────── */}
+            <Route path="/admin/complaints" element={<ProtectedRoute roles={["manager", "owner", "admin"]}><AdminComplaintResolution /></ProtectedRoute>} />
+
+            {/* ── Owner + Admin only ──────────────────────────────────────── */}
+            <Route path="/admin/dashboard" element={<ProtectedRoute roles={["owner", "admin"]}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/users"     element={<ProtectedRoute roles={["owner", "admin"]}><AdminUserManagement /></ProtectedRoute>} />
+            <Route path="/admin/stores"    element={<ProtectedRoute roles={["owner", "admin"]}><AdminStoreManagement /></ProtectedRoute>} />
+
+            {/* ── Fallback ────────────────────────────────────────────────── */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

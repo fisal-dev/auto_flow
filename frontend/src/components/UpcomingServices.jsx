@@ -223,7 +223,7 @@ const UpcomingServices = () => {
             <Card variant="bordered" className="w-full max-w-md bg-surface/95 border-white/10 p-6 shadow-2xl relative animate-scale-up">
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>

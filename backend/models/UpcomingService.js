@@ -5,7 +5,7 @@ const UpcomingServiceSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   description: { type: String, required: true },
   urgency: { type: String, enum: ['warning', 'neutral', 'info'], default: 'neutral' },
-  status: { type: String, enum: ['pending', 'completed'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
   provider: { type: String, default: '' }
 }, { timestamps: true });
 
