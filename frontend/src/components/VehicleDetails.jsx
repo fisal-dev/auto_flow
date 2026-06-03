@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Car, Wrench, Fuel, DollarSign, ArrowLeft, CalendarClock, Settings2, ReceiptText, MapPin, GaugeCircle, Trash2 } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
@@ -22,6 +22,59 @@ const VehicleDetails = () => {
   const [upcomingMaintenance, setUpcomingMaintenance] = useState([]);
   const [fuelLog, setFuelLog] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDocUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploadingDoc(true);
+    try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+      const res = await fetch(`${apiBase}/vehicles/${id}/documents`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setVehicle(data);
+        toast.success("Document uploaded successfully!");
+      } else {
+        toast.error(data.message || "Failed to upload document");
+      }
+    } catch (err) {
+      toast.error("Failed to upload document. Connection error.");
+    } finally {
+      setUploadingDoc(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDocDelete = async (docId) => {
+    const isConfirmed = await confirm({
+      title: "Delete Document",
+      message: "Are you sure you want to permanently delete this document?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
+
+    try {
+      const data = await api.delete(`/vehicles/${id}/documents/${docId}`);
+      setVehicle(data);
+      toast.success("Document deleted successfully.");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete document.");
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -449,28 +502,67 @@ const VehicleDetails = () => {
                 <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <ReceiptText className="text-indigo-400 w-5 h-5" /> Vehicle Documentation
                 </h2>
-                <Button variant="secondary" size="sm">Upload Document</Button>
+                <div className="flex items-center">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleDocUpload}
+                    className="hidden"
+                  />
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => fileInputRef.current?.click()}
+                    isLoading={uploadingDoc}
+                    disabled={uploadingDoc}
+                  >
+                    Upload Document
+                  </Button>
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { name: "Insurance Card.pdf", size: "1.2 MB", type: "PDF Document", date: "Jan 01, 2024" },
-                  { name: "Vehicle Registration.pdf", size: "840 KB", type: "PDF Document", date: "Nov 15, 2023" },
-                  { name: "Sales Contract.pdf", size: "4.5 MB", type: "PDF Document", date: "Oct 10, 2020" },
-                  { name: "Annual Inspection.pdf", size: "2.1 MB", type: "PDF Document", date: "Dec 12, 2023" },
-                ].map((doc, i) => (
-                  <div key={i} className="flex justify-between items-center bg-white/5 border border-white/5 p-4 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-                        <ReceiptText className="w-4 h-4" />
+                {(vehicle.documents && vehicle.documents.length > 0) ? (
+                  vehicle.documents.map((doc, i) => (
+                    <div key={doc._id || i} className="flex justify-between items-center bg-white/5 border border-white/5 p-4 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                          <ReceiptText className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-foreground truncate max-w-[150px] sm:max-w-[220px]" title={doc.name}>
+                            {doc.name}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {doc.size || 'N/A'} • Uploaded: {new Date(doc.uploadedAt).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">{doc.name}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{doc.type} • {doc.size} • Uploaded: {doc.date}</p>
+                      <div className="flex gap-2 items-center">
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="h-8 py-0"
+                          onClick={() => window.open(doc.url, "_blank", "noopener,noreferrer")}
+                        >
+                          Download
+                        </Button>
+                        {(user.role === "customer" || user.role === "owner" || user.role === "manager") && (
+                          <button
+                            onClick={() => handleDocDelete(doc._id)}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-all cursor-pointer"
+                            title="Delete Document"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <Button variant="secondary" size="sm" className="h-8 py-0">Download</Button>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12 text-slate-500 text-sm">
+                    No documents uploaded for this vehicle.
                   </div>
-                ))}
+                )}
               </div>
             </Card>
           </div>

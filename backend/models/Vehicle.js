@@ -9,6 +9,12 @@ const VehicleSchema = new mongoose.Schema({
   status: { type: String, enum: ['success', 'warning', 'danger'], default: 'success' },
   mileage: { type: String, default: '0 km' },
   image: { type: String, default: '' },
+  documents: [{
+    name: { type: String, required: true },
+    url: { type: String, required: true },
+    size: { type: String, required: true },
+    uploadedAt: { type: Date, default: Date.now }
+  }],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 
