@@ -1,5 +1,5 @@
 const express = require('express');
-const { upload } = require('../config/cloudinary');
+const { upload } = require('../config/multer');
 const uploadController = require('../controllers/uploadController');
 const userRouter = require('./userRouter');
 const adminRouter = require('./adminRouter');

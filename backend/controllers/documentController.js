@@ -29,59 +29,42 @@ const documentController = {
       let docUrl = '';
       let docSize = '';
 
-      if (supabase) {
-        try {
-          const fileBuffer = fs.readFileSync(req.file.path);
-          const extension = path.extname(originalName) || '';
-          const baseName = path.basename(originalName, extension);
-          const fileName = `${baseName}-${Date.now()}${extension}`;
+      if (!supabase) {
+        throw new Error('Supabase client is not configured.');
+      }
 
-          // Upload file to Supabase bucket 'documents'
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('documents')
-            .upload(fileName, fileBuffer, {
-              contentType: req.file.mimetype,
-              upsert: true
-            });
+      try {
+        const fileBuffer = fs.readFileSync(req.file.path);
+        const extension = path.extname(originalName) || '';
+        const baseName = path.basename(originalName, extension);
+        const fileName = `${baseName}-${Date.now()}${extension}`;
 
-          if (uploadError) {
-            throw new Error(
-              `${uploadError.message}. Make sure you have created a public bucket named 'documents' in your Supabase Storage dashboard.`
-            );
-          }
-
-          // Retrieve the public URL
-          const { data: urlData } = supabase.storage
-            .from('documents')
-            .getPublicUrl(fileName);
-
-          docUrl = urlData.publicUrl;
-          docSize = formatBytes(req.file.size);
-        } catch (storageErr) {
-          console.error('Supabase upload failed:', storageErr.message);
-          return res.status(500).json({ 
-            message: 'Supabase storage error: ' + storageErr.message 
+        // Upload file to Supabase bucket 'documents'
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(fileName, fileBuffer, {
+            contentType: req.file.mimetype,
+            upsert: true
           });
+
+        if (uploadError) {
+          throw new Error(
+            `${uploadError.message}. Make sure you have created a public bucket named 'documents' in your Supabase Storage dashboard.`
+          );
         }
-      } else {
-        // Fallback to local storage
-        const uploadsDir = path.join(__dirname, '..', 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
-        }
 
-        const extension = path.extname(originalName) || '.pdf';
-        const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`;
-        const destPath = path.join(uploadsDir, filename);
+        // Retrieve the public URL
+        const { data: urlData } = supabase.storage
+          .from('documents')
+          .getPublicUrl(fileName);
 
-        fs.copyFileSync(req.file.path, destPath);
-
-        const protocol = req.protocol;
-        const host = req.get('host');
-        docUrl = `${protocol}://${host}/uploads/${filename}`;
-        
-        const stats = fs.statSync(destPath);
-        docSize = formatBytes(stats.size);
+        docUrl = urlData.publicUrl;
+        docSize = formatBytes(req.file.size);
+      } catch (storageErr) {
+        console.error('Supabase upload failed:', storageErr.message);
+        return res.status(500).json({ 
+          message: 'Supabase storage error: ' + storageErr.message 
+        });
       }
 
       // Add document metadata to vehicle

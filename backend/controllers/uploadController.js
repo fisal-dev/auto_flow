@@ -1,4 +1,4 @@
-const { cloudinary } = require('../config/cloudinary');
+const { supabase } = require('../config/supabase');
 const fs = require('fs');
 const path = require('path');
 
@@ -9,58 +9,44 @@ const uploadController = {
         return res.status(400).json({ message: 'No file uploaded' });
       }
 
-      // Check if Cloudinary credentials are mock/default. If so, go straight to fallback.
-      const isCloudinaryConfigured = 
-        process.env.CLOUD_NAME && 
-        process.env.CLOUD_NAME !== 'autoflow_cloud' &&
-        process.env.CLOUD_API_KEY &&
-        process.env.CLOUD_API_KEY !== '123456789';
-
-      if (!isCloudinaryConfigured) {
-        throw new Error('Cloudinary not configured, using local storage fallback');
+      if (!supabase) {
+        throw new Error('Supabase client is not configured.');
       }
 
-      // Upload file to Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'autoflow_attachments',
-        resource_type: 'auto'
-      });
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const originalName = req.file.originalname;
+      const extension = path.extname(originalName) || '';
+      const baseName = path.basename(originalName, extension);
+      const fileName = `${baseName}-${Date.now()}${extension}`;
+
+      // Upload file to Supabase bucket 'documents'
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(fileName, fileBuffer, {
+          contentType: req.file.mimetype,
+          upsert: true
+        });
+
+      if (uploadError) {
+        throw new Error(
+          `${uploadError.message}. Make sure you have created a public bucket named 'documents' in your Supabase Storage dashboard.`
+        );
+      }
+
+      // Retrieve the public URL
+      const { data: urlData } = supabase.storage
+        .from('documents')
+        .getPublicUrl(fileName);
 
       res.status(200).json({
-        url: result.secure_url,
-        publicId: result.public_id
+        url: urlData.publicUrl,
+        publicId: fileName
       });
     } catch (err) {
-      console.warn('Cloudinary upload failed or not configured, using local fallback:', err.message);
-      
-      try {
-        // Ensure local uploads directory exists
-        const uploadsDir = path.join(__dirname, '..', 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-
-        // Generate local filename
-        const extension = path.extname(req.file.originalname) || '.jpg';
-        const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`;
-        const destPath = path.join(uploadsDir, filename);
-
-        // Copy file from temp path to destPath
-        fs.copyFileSync(req.file.path, destPath);
-
-        // Get server base URL
-        const protocol = req.protocol;
-        const host = req.get('host'); // e.g. localhost:3000
-        const localUrl = `${protocol}://${host}/uploads/${filename}`;
-
-        res.status(200).json({
-          url: localUrl,
-          publicId: filename
-        });
-      } catch (localErr) {
-        console.error('Local fallback upload failed:', localErr.message);
-        res.status(500).json({ message: 'File upload failed: ' + localErr.message });
-      }
+      console.error('Supabase upload failed:', err.message);
+      res.status(500).json({ 
+        message: 'Supabase storage error: ' + err.message 
+      });
     }
   }
 };

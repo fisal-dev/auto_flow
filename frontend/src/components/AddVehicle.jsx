@@ -331,7 +331,7 @@ const AddVehicle = () => {
                     onChange={handleUpload}
                     className="input-field py-2 bg-white/5"
                   />
-                  {uploading && <p className="text-xs text-indigo-400 font-semibold animate-pulse">Uploading photo to Cloudinary...</p>}
+                  {uploading && <p className="text-xs text-indigo-400 font-semibold animate-pulse">Uploading photo to Supabase...</p>}
                   {imageUrl && (
                     <div className="mt-2 w-32 h-20 rounded-lg overflow-hidden border border-white/10 relative">
                       <img src={imageUrl} alt="Uploaded Vehicle" className="w-full h-full object-cover" />

@@ -3,7 +3,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const vehicleController = require('../controllers/vehicleController');
 
 const vehicleRoutes = express.Router();
-const { upload } = require('../config/cloudinary');
+const { upload } = require('../config/multer');
 const documentController = require('../controllers/documentController');
 
 vehicleRoutes.get('/', authMiddleware, vehicleController.getVehicles);
