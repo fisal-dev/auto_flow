@@ -9,8 +9,8 @@ const stripeController = require('./controllers/stripeController');
 
 const app = express();
 
-// Trust reverse proxy (e.g. Render, Cloudflare) to ensure req.protocol is 'https'
-app.enable('trust proxy');
+// Trust the first hop of reverse proxy (e.g. Render, Cloudflare) safely
+app.set('trust proxy', 1);
 
 // Apply Helmet Security Headers and allow cross-origin resource sharing for static files
 app.use(helmet({
