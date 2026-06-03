@@ -538,14 +538,14 @@ const VehicleDetails = () => {
                         </div>
                       </div>
                       <div className="flex gap-2 items-center">
-                        <Button 
-                          variant="secondary" 
-                          size="sm" 
-                          className="h-8 py-0"
-                          onClick={() => window.open(doc.url, "_blank", "noopener,noreferrer")}
+                        <a 
+                          href={doc.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="relative inline-flex items-center justify-center transition-all duration-200 overflow-hidden group select-none px-3.5 py-1.5 text-xs rounded-lg gap-1.5 h-8 glass-panel text-white font-semibold hover:bg-white/10 hover:border-white/15 cursor-pointer"
                         >
                           Download
-                        </Button>
+                        </a>
                         {(user.role === "customer" || user.role === "owner" || user.role === "manager") && (
                           <button
                             onClick={() => handleDocDelete(doc._id)}
