@@ -75,10 +75,16 @@ const ExpenseReports = () => {
 
   const exportCSV = () => {
     const headers = "Vehicle,Category,Date,Cost (INR),Type\n";
-    const rows = filteredExpenses.map(e => 
-      `"${e.vehicle}","${e.category.replace(/"/g, '""')}","${new Date(e.date).toLocaleDateString()}",${e.cost},"${e.type}"`
-    ).join("\n");
-    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+    const rows = filteredExpenses.map(e => {
+      const dateObj = new Date(e.date);
+      const dateStr = isNaN(dateObj.getTime()) 
+        ? "" 
+        : dateObj.toISOString().split('T')[0];
+      return `"${e.vehicle}","${e.category.replace(/"/g, '""')}","${dateStr}",${e.cost},"${e.type}"`;
+    }).join("\n");
+    
+    // Prepend UTF-8 BOM (\uFEFF) so Excel opens it with correct UTF-8 encoding
+    const blob = new Blob(["\uFEFF" + headers + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -119,49 +125,71 @@ const ExpenseReports = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="relative group">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-                <Search className="w-4 h-4" />
-              </span>
-              <input
-                type="text"
-                name="vehicle"
-                placeholder="Search Vehicle Name..."
-                value={filters.vehicle}
-                onChange={handleFilterChange}
-                className="input-field pl-10"
-              />
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Vehicle</label>
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                  <Search className="w-4 h-4" />
+                </span>
+                <input
+                  type="text"
+                  name="vehicle"
+                  placeholder="Search Vehicle Name..."
+                  value={filters.vehicle}
+                  onChange={handleFilterChange}
+                  className="input-field pl-10"
+                />
+              </div>
             </div>
 
-            <div className="relative group">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-                <Search className="w-4 h-4" />
-              </span>
-              <input
-                type="text"
-                name="category"
-                placeholder="Search Category..."
-                value={filters.category}
-                onChange={handleFilterChange}
-                className="input-field pl-10"
-              />
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Category</label>
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                  <Search className="w-4 h-4" />
+                </span>
+                <input
+                  type="text"
+                  name="category"
+                  placeholder="Search Category..."
+                  value={filters.category}
+                  onChange={handleFilterChange}
+                  className="input-field pl-10"
+                />
+              </div>
             </div>
 
-            <input
-              type="date"
-              name="startDate"
-              value={filters.startDate}
-              onChange={handleFilterChange}
-              className="input-field"
-            />
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Start Date</label>
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                  <CalendarClock className="w-4 h-4" />
+                </span>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={filters.startDate}
+                  onChange={handleFilterChange}
+                  className="input-field pl-10"
+                />
+              </div>
+            </div>
 
-            <input
-              type="date"
-              name="endDate"
-              value={filters.endDate}
-              onChange={handleFilterChange}
-              className="input-field"
-            />
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">End Date</label>
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                  <CalendarClock className="w-4 h-4" />
+                </span>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={filters.endDate}
+                  onChange={handleFilterChange}
+                  className="input-field pl-10"
+                />
+              </div>
+            </div>
           </div>
         </Card>
 
