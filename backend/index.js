@@ -9,8 +9,13 @@ const stripeController = require('./controllers/stripeController');
 
 const app = express();
 
-// Apply Helmet Security Headers
-app.use(helmet());
+// Trust reverse proxy (e.g. Render, Cloudflare) to ensure req.protocol is 'https'
+app.enable('trust proxy');
+
+// Apply Helmet Security Headers and allow cross-origin resource sharing for static files
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // Apply Rate Limiter
 const limiter = rateLimit({
