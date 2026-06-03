@@ -56,6 +56,7 @@ const IndexPage = () => {
         setCheckingSession(true);
         try {
           const res = await api.post("/user/verify-device", { deviceToken });
+          localStorage.setItem("remember", "true");
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("token", res.token);
           localStorage.setItem("user", JSON.stringify(res.user));

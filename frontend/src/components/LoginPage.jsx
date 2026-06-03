@@ -41,11 +41,13 @@ const LoginPage = () => {
       });
       
       if (rememberMe) {
+        localStorage.setItem("remember", "true");
         localStorage.setItem("rememberedEmail", email);
         if (res.deviceToken) {
           localStorage.setItem("rememberDeviceToken", res.deviceToken);
         }
       } else {
+        localStorage.setItem("remember", "false");
         localStorage.removeItem("rememberedEmail");
         localStorage.removeItem("rememberDeviceToken");
       }

@@ -12,6 +12,7 @@ const handleResponse = async (res) => {
   if (res.status === 401) {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     // Only redirect if not already on the login/signup page to prevent loops
     if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/signup") && window.location.pathname !== "/") {
       window.location.href = "/login";
