@@ -38,7 +38,9 @@ const documentController = {
       if (isCloudinaryConfigured) {
         // Upload to Cloudinary
         const isImage = req.file.mimetype ? req.file.mimetype.startsWith('image/') : false;
-        const resourceType = isImage ? 'image' : 'raw';
+        const isPdf = req.file.mimetype === 'application/pdf';
+        const resourceType = (isImage || isPdf) ? 'image' : 'raw';
+        
         const extension = path.extname(originalName) || '';
         const baseName = path.basename(originalName, extension);
         
