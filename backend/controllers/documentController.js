@@ -1,5 +1,5 @@
 const Vehicle = require('../models/Vehicle');
-const { cloudinary } = require('../config/cloudinary');
+const { supabase } = require('../config/supabase');
 const fs = require('fs');
 const path = require('path');
 
@@ -26,37 +26,43 @@ const documentController = {
       }
 
       const originalName = req.file.originalname;
-      const isCloudinaryConfigured = 
-        process.env.CLOUD_NAME && 
-        process.env.CLOUD_NAME !== 'autoflow_cloud' &&
-        process.env.CLOUD_API_KEY &&
-        process.env.CLOUD_API_KEY !== '123456789';
-
       let docUrl = '';
       let docSize = '';
 
-      if (isCloudinaryConfigured) {
-        // Upload to Cloudinary
-        const isImage = req.file.mimetype ? req.file.mimetype.startsWith('image/') : false;
-        const isPdf = req.file.mimetype === 'application/pdf';
-        const resourceType = (isImage || isPdf) ? 'image' : 'raw';
-        
-        const extension = path.extname(originalName) || '';
-        const baseName = path.basename(originalName, extension);
-        
-        const uploadOptions = {
-          folder: 'autoflow_documents',
-          resource_type: resourceType
-        };
+      if (supabase) {
+        try {
+          const fileBuffer = fs.readFileSync(req.file.path);
+          const extension = path.extname(originalName) || '';
+          const baseName = path.basename(originalName, extension);
+          const fileName = `${baseName}-${Date.now()}${extension}`;
 
-        if (resourceType === 'raw') {
-          // Raw files in Cloudinary need the extension in the public_id to preserve format
-          uploadOptions.public_id = `${baseName}-${Date.now()}${extension}`;
+          // Upload file to Supabase bucket 'documents'
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(fileName, fileBuffer, {
+              contentType: req.file.mimetype,
+              upsert: true
+            });
+
+          if (uploadError) {
+            throw new Error(
+              `${uploadError.message}. Make sure you have created a public bucket named 'documents' in your Supabase Storage dashboard.`
+            );
+          }
+
+          // Retrieve the public URL
+          const { data: urlData } = supabase.storage
+            .from('documents')
+            .getPublicUrl(fileName);
+
+          docUrl = urlData.publicUrl;
+          docSize = formatBytes(req.file.size);
+        } catch (storageErr) {
+          console.error('Supabase upload failed:', storageErr.message);
+          return res.status(500).json({ 
+            message: 'Supabase storage error: ' + storageErr.message 
+          });
         }
-
-        const result = await cloudinary.uploader.upload(req.file.path, uploadOptions);
-        docUrl = result.secure_url;
-        docSize = formatBytes(result.bytes || req.file.size);
       } else {
         // Fallback to local storage
         const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -74,7 +80,6 @@ const documentController = {
         const host = req.get('host');
         docUrl = `${protocol}://${host}/uploads/${filename}`;
         
-        // Get file size from disk if not present in multer
         const stats = fs.statSync(destPath);
         docSize = formatBytes(stats.size);
       }
@@ -100,6 +105,17 @@ const documentController = {
       const vehicle = await Vehicle.findById(id);
       if (!vehicle) {
         return res.status(404).json({ message: 'Vehicle not found' });
+      }
+
+      const doc = vehicle.documents.find(d => d._id.toString() === docId);
+      
+      // If the file was stored on Supabase, delete it from Supabase storage as well
+      if (doc && supabase && doc.url.includes('supabase.co')) {
+        const parts = doc.url.split('/public/documents/');
+        if (parts.length > 1) {
+          const filePath = parts[1];
+          await supabase.storage.from('documents').remove([filePath]);
+        }
       }
 
       // Remove document from the list
