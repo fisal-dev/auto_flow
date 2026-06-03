@@ -43,6 +43,14 @@ const colorMap = {
     glow:   "shadow-[0_0_20px_rgba(139,92,246,0.12)]",
     ambient:"bg-violet-500/10",
   },
+  purple: {
+    text:   "text-purple-400",
+    bg:     "bg-purple-500/10",
+    border: "border-purple-500/20",
+    bar:    "bg-purple-500",
+    glow:   "shadow-[0_0_20px_rgba(168,85,247,0.12)]",
+    ambient:"bg-purple-500/10",
+  },
 };
 
 const StatCard = ({

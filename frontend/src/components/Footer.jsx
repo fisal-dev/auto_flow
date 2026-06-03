@@ -5,7 +5,7 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 const dashboardRoutes = [
   "/dashboard", "/vehicles", "/vehicle/",
-  "/maintenance-records", "/upcoming-services",
+  "/maintenance-records", "/maintenance", "/upcoming-services",
   "/service-centers", "/expense-reports",
   "/fuel-consumption", "/performance-analytics",
   "/report-complaint", "/complaint-history",
