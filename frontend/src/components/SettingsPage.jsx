@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle2, Settings2, Sliders, BellRing, Briefcase, RefreshCcw, Save } from "lucide-react";
+import { CheckCircle2, Settings2, Sliders, BellRing, Briefcase, RefreshCcw, Save, Lock, Key, AlertCircle, Eye, EyeOff } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
@@ -18,6 +18,61 @@ const SettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+
+  // Change password states
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordError("");
+    setPasswordSuccess(false);
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("New passwords do not match!");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters long!");
+      return;
+    }
+
+    setPasswordSaving(true);
+    try {
+      await api.put("/user/change-password", {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      setPasswordSuccess(true);
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      toast.success("Password changed successfully!");
+      setTimeout(() => {
+        setPasswordSuccess(false);
+      }, 5000);
+    } catch (err) {
+      setPasswordError(err.message || "Failed to update password.");
+      toast.error(err.message || "Failed to update password.");
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -127,35 +182,7 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* Billing / Plan Card */}
-        <Card variant="bordered" className="p-6 bg-surface/80 border-indigo-500/20 mb-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-[50px] pointer-events-none" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">Account Plan</span>
-              <h2 className="text-xl font-extrabold text-white mt-1">
-                AutoFlow {subscriptionStatus === "premium" ? "Premium 🚀" : "Basic (Free)"}
-              </h2>
-              <p className="text-slate-400 text-xs mt-1.5 max-w-md">
-                {subscriptionStatus === "premium" 
-                  ? "Thank you for supporting AutoFlow! You have unlocked all premium metrics, reports, and unlimited fleet logs." 
-                  : "Unlock premium analytics, priority notifications, and automatic scheduling features."
-                }
-              </p>
-            </div>
-            {subscriptionStatus !== "premium" && (
-              <Button 
-                onClick={handleUpgrade} 
-                variant="primary" 
-                size="md" 
-                isLoading={upgrading}
-                className="w-full sm:w-auto shrink-0 bg-gradient-to-r from-indigo-500 to-purple-500 border-none hover:opacity-90 shadow-lg shadow-indigo-500/25"
-              >
-                Upgrade to Premium
-              </Button>
-            )}
-          </div>
-        </Card>
+
 
         <Card variant="bordered" className="bg-[#0D1424]/80 p-8 relative overflow-hidden">
           
@@ -169,31 +196,6 @@ const SettingsPage = () => {
           </div>
 
           <form onSubmit={handleSave} className="space-y-8 relative z-10">
-            
-            {/* Enable Notifications checkbox */}
-            <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02] flex items-start gap-4">
-               <div className="mt-1">
-                  <BellRing className="w-5 h-5 text-indigo-400" />
-               </div>
-               <div className="flex-grow">
-                  <label className="flex items-start justify-between cursor-pointer group">
-                     <div>
-                        <span className="text-white font-bold block mb-1">Email Notifications</span>
-                        <span className="text-slate-400 text-sm">Receive updates regarding oil status and rotations</span>
-                     </div>
-                     <div className="relative inline-flex items-center cursor-pointer">
-                        <input
-                           type="checkbox"
-                           name="notifications"
-                           checked={settings.notifications}
-                           onChange={handleChange}
-                           className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-[#0D121F] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border border-white/10 peer-checked:bg-indigo-500"></div>
-                     </div>
-                  </label>
-               </div>
-            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                {/* Reminder Frequency */}
@@ -248,6 +250,138 @@ const SettingsPage = () => {
                  Save Preferences
                </Button>
             </div>
+          </form>
+
+          {/* Collapsible Change Password Section */}
+          <form onSubmit={handlePasswordSubmit} className="pt-8 mt-8 border-t border-white/10 space-y-6 relative z-10">
+             <label className="flex items-center justify-between cursor-pointer select-none group">
+               <div className="flex items-center gap-3">
+                 <div className="p-2 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 group-hover:bg-rose-500/20 transition-all">
+                   <Lock className="w-4 h-4" />
+                 </div>
+                 <div>
+                   <span className="text-white font-bold block text-sm group-hover:text-rose-300 transition-colors">Update Account Password</span>
+                   <span className="text-slate-400 text-xs">Reveal fields to update your security credentials</span>
+                 </div>
+               </div>
+               <div className="relative inline-flex items-center">
+                 <input
+                   type="checkbox"
+                   checked={showChangePassword}
+                   onChange={(e) => setShowChangePassword(e.target.checked)}
+                   className="sr-only peer"
+                 />
+                 <div className="w-11 h-6 bg-[#0D121F] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-rose-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border border-white/10 peer-checked:bg-rose-500"></div>
+               </div>
+             </label>
+
+            {showChangePassword && (
+              <div className="pt-6 border-t border-white/5 space-y-4 animate-scale-up">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Current Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Password</label>
+                    <div className="relative group">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 group-focus-within:text-rose-400 transition-colors">
+                        <Key className="w-3.5 h-3.5" />
+                      </span>
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        className="input-field pl-9 pr-9 text-xs focus:border-rose-500/40 focus:ring-rose-500/10"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* New Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">New Password</label>
+                    <div className="relative group">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 group-focus-within:text-rose-400 transition-colors">
+                        <Lock className="w-3.5 h-3.5" />
+                      </span>
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        className="input-field pl-9 pr-9 text-xs focus:border-rose-500/40 focus:ring-rose-500/10"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm New Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Confirm Password</label>
+                    <div className="relative group">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 group-focus-within:text-rose-400 transition-colors">
+                        <Lock className="w-3.5 h-3.5" />
+                      </span>
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        className="input-field pl-9 pr-9 text-xs focus:border-rose-500/40 focus:ring-rose-500/10"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {passwordError && (
+                  <div className="flex items-center gap-2 text-rose-400 text-xs font-semibold justify-center bg-rose-500/10 border border-rose-500/20 py-2 rounded-xl">
+                    <AlertCircle className="w-4 h-4" /> {passwordError}
+                  </div>
+                )}
+
+                {passwordSuccess && (
+                  <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold justify-center bg-emerald-500/10 border border-emerald-500/20 py-2 rounded-xl">
+                    <CheckCircle2 className="w-4 h-4" /> Password updated successfully!
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <Button 
+                    type="submit" 
+                    variant="primary" 
+                    size="sm" 
+                    isLoading={passwordSaving}
+                    className="bg-rose-600 hover:bg-rose-500 text-xs py-2 px-4 shadow-lg shadow-rose-500/15 border-none font-bold"
+                  >
+                    Update Password
+                  </Button>
+                </div>
+              </div>
+            )}
           </form>
         </Card>
       </div>

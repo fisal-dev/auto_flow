@@ -11,18 +11,21 @@ const upcomingController = {
         const vehicles = await Vehicle.find({ userId: req.user.id });
         const vehicleIds = vehicles.map(v => v._id);
         query = { vehicleId: { $in: vehicleIds } };
+      } else if (req.user.role === 'admin' || req.user.role === 'owner') {
+        // Admins and owners see all tasks of all garages
+        query = {};
+      } else if (req.user.role === 'manager') {
+        // Managers see tasks scheduled at their assigned garages or with no provider
+        const garages = req.user.assignedGarages || [];
+        query = {
+          $or: [
+            { provider: { $in: garages } },
+            { provider: { $in: ['', null] } },
+            { provider: { $exists: false } }
+          ]
+        };
       } else {
-        // Business view: managers/owners see services scheduled at their garages
-        let garages = [];
-        if (req.user.role === 'manager') {
-          garages = req.user.assignedGarages || [];
-        } else if (req.user.role === 'owner') {
-          const managers = await User.find({ ownerId: req.user.id, role: 'manager' });
-          const managerGarages = managers.reduce((acc, m) => acc.concat(m.assignedGarages || []), []);
-          const ownerGarages = req.user.assignedGarages || [];
-          garages = Array.from(new Set([...ownerGarages, ...managerGarages]));
-        }
-        query = { provider: { $in: garages } };
+        query = { _id: null }; // Default empty query for safety
       }
 
       const services = await UpcomingService.find(query)
@@ -131,16 +134,20 @@ const upcomingController = {
       await service.save();
 
       if (status === 'completed') {
+        const cost = Number(req.body.cost) || 0;
+        const notes = req.body.notes || '';
+        const serviceDescription = notes ? `${service.description} (Notes: ${notes})` : service.description;
+
         // Log it to maintenance history too
         const record = new MaintenanceRecord({
           vehicleId: service.vehicleId,
           date: new Date(),
-          service: service.description,
-          cost: 0,
+          service: serviceDescription,
+          cost: cost,
           provider: service.provider || 'Scheduled Maintenance',
           status: 'success',
           label: 'Completed',
-          paymentStatus: 'paid'
+          paymentStatus: cost > 0 ? 'unpaid' : 'paid'
         });
         await record.save();
 
@@ -165,5 +172,10 @@ const upcomingController = {
     }
   }
 };
+
+module.exports = upcomingController;
+
+
+
 
 module.exports = upcomingController;

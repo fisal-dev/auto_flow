@@ -67,7 +67,10 @@ const vehicleController = {
       res.status(201).json(vehicle);
     } catch (err) {
       console.error(err);
-      res.status(500).json({ message: 'Server error' });
+      if (err.name === 'ValidationError') {
+        return res.status(400).json({ message: err.message });
+      }
+      res.status(500).json({ message: 'Server error: ' + err.message });
     }
   },
 

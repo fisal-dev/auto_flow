@@ -6,9 +6,11 @@ import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import { api } from "../utils/api";
 import { useToast } from "./ui/Toast";
+import { useConfirm } from "./ui/Confirm";
 
 const ManagerManagement = () => {
   const toast = useToast();
+  const confirm = useConfirm();
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const isOwner = currentUser.role === "owner" || currentUser.role === "admin";
 
@@ -97,7 +99,14 @@ const ManagerManagement = () => {
   };
 
   const handleDeleteManager = async (managerId) => {
-    if (!window.confirm("Are you sure you want to terminate this manager's account?")) return;
+    const isConfirmed = await confirm({
+      title: "Terminate Manager",
+      message: "Are you sure you want to terminate this manager's account? They will lose access to assigned garages immediately.",
+      confirmText: "Terminate",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
     try {
       await api.delete(`/user/managers/${managerId}`);
       setManagers(prev => prev.filter(m => m._id !== managerId));

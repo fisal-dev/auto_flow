@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Car, Plus, Wrench, ChevronRight, Search, Activity, CheckCircle2, AlertTriangle, Settings2, SlidersHorizontal } from "lucide-react";
+import { Car, Plus, Wrench, ChevronRight, Search, Activity, CheckCircle2, AlertTriangle, Settings2, SlidersHorizontal, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
+import { useToast } from "./ui/Toast";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -19,6 +20,23 @@ const itemVariants = {
 };
 
 const VehicleList = () => {
+  const toast = useToast();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const canLogService = user.role === "owner" || user.role === "manager";
+
+  const handleDelete = async (vehicleId, make, model) => {
+    if (!window.confirm(`Are you sure you want to delete ${make} ${model}?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/vehicles/${vehicleId}`);
+      toast.success(`${make} ${model} removed successfully.`);
+      setVehicles(prev => prev.filter(v => v._id !== vehicleId));
+    } catch (err) {
+      toast.error(err.message || "Failed to delete vehicle.");
+    }
+  };
+
   const [vehicles, setVehicles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -142,6 +160,12 @@ const VehicleList = () => {
                           <span className="text-slate-500 text-sm font-medium">Registration</span>
                           <span className="text-slate-200 text-sm font-mono font-bold bg-white/5 px-2 py-0.5 rounded">{veh.registration}</span>
                         </div>
+                        <div className="flex justify-between items-center py-2 border-b border-white/5">
+                          <span className="text-slate-500 text-sm font-medium">Odometer Mileage</span>
+                          <span className="text-slate-200 text-sm font-bold">
+                            {veh.mileage ? (String(veh.mileage).toLowerCase().includes('km') ? veh.mileage : `${Number(veh.mileage).toLocaleString()} km`) : '0 km'}
+                          </span>
+                        </div>
                         <div className="flex justify-between items-center py-2">
                           <span className="text-slate-500 text-sm font-medium">VIN Code</span>
                           <span className="text-slate-400 text-xs font-mono">{veh.vin ? (veh.vin.length > 12 ? `${veh.vin.substring(0, 12)}...` : veh.vin) : 'N/A'}</span>
@@ -155,11 +179,21 @@ const VehicleList = () => {
                             View Dashboard
                           </Button>
                         </Link>
-                        <Link to="/maintenance">
-                          <Button variant="outline" className="px-3" title="Log Service">
-                            <Wrench className="w-4 h-4" />
-                          </Button>
-                        </Link>
+                        {canLogService && (
+                          <Link to={`/maintenance?vehicleId=${veh._id}`}>
+                            <Button variant="outline" className="px-3" title="Log Service">
+                              <Wrench className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          className="px-3 border-rose-500/20 hover:border-rose-500 hover:bg-rose-500/10 text-rose-400" 
+                          title="Delete Vehicle"
+                          onClick={() => handleDelete(veh._id, veh.make, veh.model)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </Card>
                   </motion.div>

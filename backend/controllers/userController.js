@@ -112,7 +112,8 @@ const userController = {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role || 'customer'
+          role: user.role || 'customer',
+          assignedGarages: user.assignedGarages || []
         },
         deviceToken
       });
@@ -394,6 +395,33 @@ const userController = {
     }
   },
 
+  changePassword: async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'Both current password and new password are required' });
+      }
+
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Incorrect current password' });
+      }
+
+      user.password = newPassword;
+      await user.save();
+
+      res.json({ message: 'Password has been updated successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
+
   verifyDevice: async (req, res) => {
     try {
       const { deviceToken } = req.body;
@@ -419,7 +447,8 @@ const userController = {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role || 'customer'
+          role: user.role || 'customer',
+          assignedGarages: user.assignedGarages || []
         }
       });
     } catch (err) {
@@ -452,11 +481,12 @@ const userController = {
         const self = await User.findById(req.user.id).select('-password');
         return res.json(self ? [self] : []);
       }
-      if (req.user.role !== 'owner') {
-        return res.status(403).json({ message: 'Access denied: Only owners can manage team managers' });
+      if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied: Only owners and admins can manage team managers' });
       }
-      // Owner sees all managers they created
-      const managers = await User.find({ ownerId: req.user.id, role: 'manager' }).select('-password');
+      let query = { role: 'manager' };
+      
+      const managers = await User.find(query).select('-password');
       res.json(managers);
     } catch (err) {
       console.error(err);
@@ -466,8 +496,8 @@ const userController = {
 
   createManager: async (req, res) => {
     try {
-      if (req.user.role !== 'owner') {
-        return res.status(403).json({ message: 'Access denied: Only owners can manage team managers' });
+      if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied: Only owners and admins can manage team managers' });
       }
       const { name, email, password, assignedGarages } = req.body;
       if (!name || !email || !password) {
@@ -502,11 +532,14 @@ const userController = {
 
   updateManager: async (req, res) => {
     try {
-      if (req.user.role !== 'owner') {
-        return res.status(403).json({ message: 'Access denied: Only owners can manage team managers' });
+      if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied: Only owners and admins can manage team managers' });
       }
       const { assignedGarages, name, email, password } = req.body;
-      const manager = await User.findOne({ _id: req.params.id, ownerId: req.user.id, role: 'manager' });
+      
+      let query = { _id: req.params.id, role: 'manager' };
+      // Let admins update any manager. Let owners also update managers to prevent ownership lockouts if ownerId is undefined/null.
+      const manager = await User.findOne(query);
       if (!manager) {
         return res.status(404).json({ message: 'Manager not found' });
       }
@@ -530,10 +563,13 @@ const userController = {
 
   deleteManager: async (req, res) => {
     try {
-      if (req.user.role !== 'owner') {
-        return res.status(403).json({ message: 'Access denied: Only owners can manage team managers' });
+      if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied: Only owners and admins can manage team managers' });
       }
-      const manager = await User.findOneAndDelete({ _id: req.params.id, ownerId: req.user.id, role: 'manager' });
+      
+      let query = { _id: req.params.id, role: 'manager' };
+      
+      const manager = await User.findOneAndDelete(query);
       if (!manager) {
         return res.status(404).json({ message: 'Manager not found' });
       }

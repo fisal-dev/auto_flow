@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapPin, Plus, Navigation, Phone, Search, Trash2, X } from "lucide-react";
+import { MapPin, Plus, Phone, Search, Trash2, X } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
@@ -16,8 +16,8 @@ const AdminStoreManagement = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [form, setForm] = useState({
     name: "",
-    address: "",
-    phone: ""
+    location: "",
+    contact: ""
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -38,8 +38,8 @@ const AdminStoreManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.address) {
-      toast.warning("Name and Address are required");
+    if (!form.name || !form.location) {
+      toast.warning("Name and Location are required");
       return;
     }
     setSubmitting(true);
@@ -47,7 +47,7 @@ const AdminStoreManagement = () => {
       await api.post("/admin/stores", form);
       toast.success("Service Station registered successfully!");
       setShowAddForm(false);
-      setForm({ name: "", address: "", phone: "" });
+      setForm({ name: "", location: "", contact: "" });
       fetchStores();
     } catch (err) {
       toast.error(err.message || "Failed to register store");
@@ -58,7 +58,7 @@ const AdminStoreManagement = () => {
 
   const filtered = stores.filter(s => 
     s.name.toLowerCase().includes(search.toLowerCase()) || 
-    s.address.toLowerCase().includes(search.toLowerCase())
+    (s.location && s.location.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -106,8 +106,8 @@ const AdminStoreManagement = () => {
                     type="text"
                     className="input-field"
                     placeholder="e.g. 102 Industrial Parkway"
-                    value={form.address}
-                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    value={form.location}
+                    onChange={(e) => setForm({ ...form, location: e.target.value })}
                     required
                   />
                 </div>
@@ -117,8 +117,8 @@ const AdminStoreManagement = () => {
                     type="text"
                     className="input-field"
                     placeholder="e.g. +91 99999 88888"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    value={form.contact}
+                    onChange={(e) => setForm({ ...form, contact: e.target.value })}
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
@@ -153,15 +153,15 @@ const AdminStoreManagement = () => {
               {filtered.map(s => (
                 <div key={s._id} className="p-4 bg-white/2 border border-white/5 rounded-xl hover:border-indigo-500/20 transition-all flex gap-3 items-start">
                   <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    <Navigation className="w-4 h-4" />
+                    <MapPin className="w-4 h-4" />
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-bold text-slate-200">{s.name}</h3>
-                    <p className="text-xs text-slate-400">{s.address}</p>
-                    {s.phone && (
+                    <p className="text-xs text-slate-400">{s.location}</p>
+                    {s.contact && (
                       <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 pt-1">
                         <Phone className="w-3.5 h-3.5" />
-                        {s.phone}
+                        {s.contact}
                       </p>
                     )}
                   </div>

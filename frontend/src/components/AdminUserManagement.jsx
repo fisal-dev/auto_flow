@@ -6,13 +6,34 @@ import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import { api } from "../utils/api";
 import { useToast } from "./ui/Toast";
+import { useConfirm } from "./ui/Confirm";
 
 const AdminUserManagement = () => {
   const toast = useToast();
+  const confirm = useConfirm();
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   
+  const handleDeleteUser = async (userId) => {
+    const isConfirmed = await confirm({
+      title: "Delete Account",
+      message: "Are you sure you want to permanently delete this user account? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      toast.success("User account deleted successfully");
+      fetchUsers();
+    } catch (err) {
+      toast.error(err.message || "Failed to delete user account");
+    }
+  };
+
   // Registration Form States
   const [showAddForm, setShowAddForm] = useState(false);
   const [adminForm, setAdminForm] = useState({
@@ -168,6 +189,7 @@ const AdminUserManagement = () => {
                     <th className="py-3 px-4">Role</th>
                     <th className="py-3 px-4">Phone</th>
                     <th className="py-3 px-4">Subscription</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,11 +218,22 @@ const AdminUserManagement = () => {
                           {u.subscriptionStatus || 'free'}
                         </Badge>
                       </td>
+                      <td className="py-3 px-4 text-right">
+                        {u._id !== currentUser.id && (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            icon={Trash2}
+                            onClick={() => handleDeleteUser(u._id)}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
+                          />
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {filteredUsers.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="py-8 text-center text-slate-500 font-bold">No accounts found.</td>
+                      <td colSpan="5" className="py-8 text-center text-slate-500 font-bold">No accounts found.</td>
                     </tr>
                   )}
                 </tbody>

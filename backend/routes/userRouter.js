@@ -12,6 +12,7 @@ userRouter.post('/verify-device', userController.verifyDevice);
 userRouter.post('/logout-device', userController.logoutDevice);
 userRouter.get('/profile', authMiddleware, userController.getProfile);
 userRouter.put('/profile', authMiddleware, userController.updateProfile);
+userRouter.put('/change-password', authMiddleware, userController.changePassword);
 userRouter.get('/settings', authMiddleware, userController.getSettings);
 userRouter.put('/settings', authMiddleware, userController.updateSettings);
 

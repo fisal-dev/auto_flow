@@ -79,7 +79,7 @@ const PerformanceAnalytics = () => {
               </div>
             </div>
 
-            <div className="flex-grow min-h-0 w-full">
+            <div className="h-[320px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={maintenanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
@@ -115,7 +115,7 @@ const PerformanceAnalytics = () => {
               </div>
             </div>
 
-            <div className="flex-grow min-h-0 w-full">
+            <div className="h-[320px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={fuelConsumptionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.05)" vertical={false} />

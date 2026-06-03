@@ -116,6 +116,7 @@ const IndexPage = () => {
             <Route path="/vehicle/:id"         element={<ProtectedRoute roles={["customer"]}><VehicleDetails /></ProtectedRoute>} />
             <Route path="/add-vehicle"         element={<ProtectedRoute roles={["customer"]}><AddVehicle /></ProtectedRoute>} />
             <Route path="/maintenance-records" element={<ProtectedRoute roles={["customer"]}><Maintenance /></ProtectedRoute>} />
+            <Route path="/maintenance"         element={<ProtectedRoute roles={["customer"]}><Maintenance /></ProtectedRoute>} />
             <Route path="/upcoming-services"   element={<ProtectedRoute roles={["customer"]}><UpcomingServices /></ProtectedRoute>} />
             <Route path="/expense-reports"     element={<ProtectedRoute roles={["customer"]}><ExpenseReports /></ProtectedRoute>} />
             <Route path="/fuel-consumption"    element={<ProtectedRoute roles={["customer"]}><FuelConsumption /></ProtectedRoute>} />

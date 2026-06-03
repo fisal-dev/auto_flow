@@ -6,9 +6,11 @@ import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
 import { useToast } from "./ui/Toast";
+import { useConfirm } from "./ui/Confirm";
 
 const NotificationsPage = () => {
   const toast = useToast();
+  const confirm = useConfirm();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,14 +53,20 @@ const NotificationsPage = () => {
   };
 
   const handleClearAll = async () => {
-    if (window.confirm("Are you sure you want to clear all notifications?")) {
-      try {
-        await api.delete("/notifications");
-        setNotifications([]);
-        toast.success("Notifications cleared successfully.");
-      } catch (err) {
-        toast.error(err.message || "Failed to clear notifications.");
-      }
+    const isConfirmed = await confirm({
+      title: "Clear Notifications",
+      message: "Are you sure you want to clear all notifications from your inbox?",
+      confirmText: "Clear All",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
+    try {
+      await api.delete("/notifications");
+      setNotifications([]);
+      toast.success("Notifications cleared successfully.");
+    } catch (err) {
+      toast.error(err.message || "Failed to clear notifications.");
     }
   };
 

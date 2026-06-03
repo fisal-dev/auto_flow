@@ -174,14 +174,14 @@ const DashboardLayout = ({ children }) => {
   })();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex relative overflow-hidden font-sans transition-colors duration-300">
+    <div className="h-screen bg-background text-foreground flex relative overflow-hidden font-sans transition-colors duration-300">
 
       {/* Ambient glows */}
       <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/4 translate-x-1/4 transition-colors duration-300" />
       <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none translate-y-1/4 -translate-x-1/4 transition-colors duration-300" />
 
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden lg:flex flex-col w-[240px] flex-shrink-0 border-r border-white/5 z-30 h-screen sticky top-0 bg-surface/80 backdrop-blur-xl transition-colors duration-300">
+      <aside className="hidden lg:flex flex-col w-60 flex-shrink-0 border-r border-white/5 z-30 h-screen sticky top-0 left-0 bg-surface/80 backdrop-blur-xl transition-colors duration-300">
         
         {/* Brand */}
         <div className="p-5 border-b border-white/5">
@@ -240,7 +240,7 @@ const DashboardLayout = ({ children }) => {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.38 }}
-              className="fixed inset-y-0 left-0 w-[240px] z-50 lg:hidden flex flex-col bg-surface border-r border-white/5"
+              className="fixed inset-y-0 left-0 w-60 z-50 lg:hidden flex flex-col bg-surface border-r border-white/5"
             >
               <div className="p-5 border-b border-white/5 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-2">
@@ -293,7 +293,7 @@ const DashboardLayout = ({ children }) => {
       </AnimatePresence>
 
       {/* ── Main Content ── */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
 
         {/* Top Bar */}
         <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-white/5 transition-colors duration-300">

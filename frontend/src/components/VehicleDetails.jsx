@@ -7,12 +7,15 @@ import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
 import { useToast } from "./ui/Toast";
+import { useConfirm } from "./ui/Confirm";
 
 const VehicleDetails = () => {
   const toast = useToast();
+  const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const [vehicle, setVehicle] = useState(null);
   const [serviceHistory, setServiceHistory] = useState([]);
@@ -41,14 +44,38 @@ const VehicleDetails = () => {
   }, [id]);
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to remove this vehicle from your fleet?")) {
-      try {
-        await api.delete(`/vehicles/${id}`);
-        toast.success("Vehicle successfully removed.");
-        navigate("/vehicles");
-      } catch (err) {
-        toast.error(err.message || "Failed to delete vehicle.");
-      }
+    const isConfirmed = await confirm({
+      title: "Remove Vehicle",
+      message: "Are you sure you want to remove this vehicle from your fleet? This will permanently delete its service history and logs.",
+      confirmText: "Remove",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
+    try {
+      await api.delete(`/vehicles/${id}`);
+      toast.success("Vehicle successfully removed.");
+      navigate("/vehicles");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete vehicle.");
+    }
+  };
+
+  const handleDeleteFuelLog = async (logId) => {
+    const isConfirmed = await confirm({
+      title: "Delete Refueling Entry",
+      message: "Are you sure you want to delete this refueling entry? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
+    try {
+      await api.delete(`/fuel/${logId}`);
+      setFuelLog(prev => prev.filter(log => log._id !== logId));
+      toast.success("Fuel record deleted successfully.");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete fuel record.");
     }
   };
 
@@ -108,9 +135,11 @@ const VehicleDetails = () => {
           </div>
           <div className="flex gap-2">
              <Button variant="danger" icon={Trash2} onClick={handleDelete}>Delete</Button>
-             <Link to="/maintenance-records">
-                <Button variant="primary" icon={Wrench}>Log Service</Button>
-             </Link>
+             {(user.role === "owner" || user.role === "manager") && (
+               <Link to="/maintenance">
+                  <Button variant="primary" icon={Wrench}>Log Service</Button>
+               </Link>
+             )}
           </div>
         </div>
 
@@ -321,28 +350,92 @@ const VehicleDetails = () => {
               <div className="overflow-x-auto">
                 {fuelLog.length === 0 ? (
                   <p className="text-slate-500 text-sm p-6">No fuel logs logged yet.</p>
-                ) : (
-                  <table className="premium-table min-w-[600px]">
-                    <thead>
-                      <tr>
-                        <th className="pl-6">Refuel Date</th>
-                        <th>Fuel Volume</th>
-                        <th>Total Cost</th>
-                        <th className="pr-6">Odometer Mileage</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {fuelLog.map((log, i) => (
-                        <tr key={i}>
-                          <td className="pl-6 text-slate-400">{new Date(log.date).toLocaleDateString()}</td>
-                          <td className="font-semibold text-slate-300">{log.liters} L</td>
-                          <td className="font-bold text-emerald-400">₹{log.cost.toLocaleString()}</td>
-                          <td className="pr-6 font-mono text-indigo-400">{log.mileage.toLocaleString()} km</td>
+                ) : (() => {
+                  const sortedFuelLogsForCalc = [...fuelLog].sort((a, b) => {
+                    const dateDiff = new Date(a.date) - new Date(b.date);
+                    if (dateDiff !== 0) return dateDiff;
+                    return Number(a.mileage) - Number(b.mileage);
+                  });
+
+                  const efficiencyMap = {};
+                  const costPerKmMap = {};
+                  for (let i = 0; i < sortedFuelLogsForCalc.length; i++) {
+                    if (i === 0) {
+                      efficiencyMap[sortedFuelLogsForCalc[i]._id] = null;
+                      costPerKmMap[sortedFuelLogsForCalc[i]._id] = null;
+                    } else {
+                      const diff = Number(sortedFuelLogsForCalc[i].mileage) - Number(sortedFuelLogsForCalc[i-1].mileage);
+                      const liters = Number(sortedFuelLogsForCalc[i].liters);
+                      const cost = Number(sortedFuelLogsForCalc[i].cost);
+                      if (diff > 0) {
+                        if (liters > 0) {
+                          efficiencyMap[sortedFuelLogsForCalc[i]._id] = (diff / liters).toFixed(2);
+                        }
+                        if (cost > 0) {
+                          costPerKmMap[sortedFuelLogsForCalc[i]._id] = (cost / diff).toFixed(2);
+                        }
+                      }
+                    }
+                  }
+
+                  const sortedFuelLog = [...fuelLog].sort((a, b) => {
+                    const dateDiff = new Date(b.date) - new Date(a.date);
+                    if (dateDiff !== 0) return dateDiff;
+                    return Number(b.mileage) - Number(a.mileage);
+                  });
+
+                  return (
+                    <table className="premium-table min-w-[650px]">
+                      <thead>
+                        <tr>
+                          <th className="pl-6">Refuel Date</th>
+                          <th>Fuel Volume</th>
+                          <th>Odometer Mileage</th>
+                          <th>Economy</th>
+                          <th>Total Cost</th>
+                          <th className="pr-6 text-center">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+                      </thead>
+                      <tbody>
+                        {sortedFuelLog.map((log, i) => (
+                          <tr key={log._id || i}>
+                            <td className="pl-6 text-slate-400">{new Date(log.date).toLocaleDateString()}</td>
+                            <td className="font-semibold text-slate-300">{log.liters} L</td>
+                            <td className="font-mono text-indigo-400">{log.mileage.toLocaleString()} km</td>
+                            <td>
+                              {costPerKmMap[log._id] ? (
+                                <div className="flex flex-col gap-1">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg w-max">
+                                    ₹{costPerKmMap[log._id]}/km
+                                  </span>
+                                  {efficiencyMap[log._id] && (
+                                    <span className="text-[10px] text-slate-500 font-semibold pl-1">
+                                      ({efficiencyMap[log._id]} kmpl)
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold bg-white/5 text-slate-400 border border-white/10 rounded-lg">
+                                  Initial Fill-up
+                                </span>
+                              )}
+                            </td>
+                            <td className="font-bold text-emerald-400">₹{log.cost.toLocaleString()}</td>
+                            <td className="pr-6 text-center">
+                              <button
+                                onClick={() => handleDeleteFuelLog(log._id)}
+                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-all cursor-pointer"
+                                title="Delete Fuel Record"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  );
+                })()}
               </div>
             </Card>
           </div>

@@ -144,11 +144,6 @@ const sendEmail = async ({ to, subject, html }) => {
     console.warn('[WARNING] SMTP credentials / Brevo / Resend APIs are not configured in backend/.env.');
     console.warn('To send real emails, add BREVO_API_KEY, RESEND_API_KEY or SMTP credentials.');
     console.warn('======================================================\n');
-    
-    console.log(`[EMAIL SIMULATOR FALLBACK]`);
-    console.log(`To: ${to}`);
-    console.log(`Subject: ${subject}`);
-    console.log(`HTML Body:\n${html}\n`);
     return { success: false, message: 'Email credentials not configured.' };
   }
 

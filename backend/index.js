@@ -54,9 +54,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Main API Route
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/v1', router);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server started at http://localhost:${PORT}`);
-});
+app.listen(PORT);

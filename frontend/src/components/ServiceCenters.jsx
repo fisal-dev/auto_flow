@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { MapPin, Plus, Phone, Navigation, Star, Clock, X } from "lucide-react";
+import { MapPin, Plus, Phone, Navigation, Star, Clock, X, Trash2 } from "lucide-react";
 import DashboardLayout from "./DashboardLayout";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 import { api } from "../utils/api";
 import { useToast } from "./ui/Toast";
+import { useConfirm } from "./ui/Confirm";
 
 const ServiceCenters = () => {
   const toast = useToast();
+  const confirm = useConfirm();
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,6 +69,34 @@ const ServiceCenters = () => {
       toast.success("Service center registered successfully!");
     } catch (err) {
       toast.error(err.message || "Failed to register service center.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const isConfirmed = await confirm({
+      title: "Remove Service Center",
+      message: "Are you sure you want to remove this service center? It will also be unassigned from any team managers.",
+      confirmText: "Remove",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!isConfirmed) return;
+
+    try {
+      await api.delete(`/service-centers/${id}`);
+      setCenters(prev => prev.filter(c => c._id !== id));
+      toast.success("Service center deleted successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete service center.");
+    }
+  };
+
+  const handleCall = (contact, name) => {
+    try {
+      navigator.clipboard.writeText(contact);
+      toast.success(`📞 ${name} — ${contact} copied to clipboard!`);
+    } catch (err) {
+      toast.info(`📞 Call ${name}: ${contact}`);
     }
   };
 
@@ -138,12 +168,25 @@ const ServiceCenters = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 pt-5 border-t border-white/5">
-                  <a href={`tel:${center.contact}`} className="block">
-                    <Button variant="secondary" className="w-full font-bold" icon={Phone} iconPosition="left">
-                      Call {center.contact}
-                    </Button>
-                  </a>
+                <div className="mt-6 pt-5 border-t border-white/5 flex gap-2">
+                  <Button
+                    variant="secondary"
+                    className="flex-grow font-bold text-xs"
+                    icon={Phone}
+                    iconPosition="left"
+                    onClick={() => handleCall(center.contact, center.name)}
+                  >
+                    Call {center.contact}
+                  </Button>
+                  {isManager && (
+                    <Button 
+                      variant="danger" 
+                      size="sm" 
+                      onClick={() => handleDelete(center._id)}
+                      icon={Trash2}
+                      className="px-3 border-none bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 shrink-0"
+                    />
+                  )}
                 </div>
 
               </Card>

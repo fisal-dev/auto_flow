@@ -287,7 +287,8 @@ const Dashboard = () => {
   const totalVehicles = stats.totalVehicles || 0;
   const pendingServices = stats.pendingServices || 0;
   const totalUpkeepCost = stats.totalUpkeepCost || 0;
-  const avgEfficiency = stats.avgEfficiency || "0 km/L";
+  const avgFuelCost = stats.avgFuelCost || "₹0.00/km";
+  const avgEfficiency = stats.avgEfficiency || "0.00 km/L";
 
   return (
     <DashboardLayout>
@@ -315,11 +316,11 @@ const Dashboard = () => {
         </div>
 
         {/* KPI Metrics row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title="Total Vehicles" value={String(totalVehicles)} subtitle="Registered fleet total" icon={Car} color="indigo" delay={0.1} />
           <StatCard title="Pending Services" value={String(pendingServices)} subtitle="Require attention" icon={Clock} color="amber" delay={0.2} />
           <StatCard title="Total Upkeep Cost" value={formatCost(totalUpkeepCost)} subtitle="Accumulated total" icon={IndianRupee} color="rose" delay={0.3} />
-          <StatCard title="Avg Efficiency" value={avgEfficiency} subtitle="Fleet average" icon={Fuel} color="emerald" delay={0.4} />
+          <StatCard title="Avg Fuel Economy" value={avgEfficiency} subtitle="Fleet average mileage" icon={Fuel} color="purple" delay={0.5} />
         </div>
 
         {/* Chart + Summary row */}

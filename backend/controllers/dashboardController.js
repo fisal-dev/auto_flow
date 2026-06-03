@@ -24,16 +24,45 @@ const dashboardController = {
         const maintenanceRecords = await MaintenanceRecord.find({ vehicleId: { $in: vehicleIds } });
         const totalUpkeepCost = maintenanceRecords.reduce((sum, r) => sum + (r.cost || 0), 0);
 
-        // Average Efficiency
-        const fuelLogs = await FuelLog.find({ vehicleId: { $in: vehicleIds } }).sort({ mileage: 1 });
-        let avgEfficiency = 0; // default
-        if (fuelLogs.length > 1) {
-          const totalLiters = fuelLogs.slice(1).reduce((sum, log) => sum + log.liters, 0);
-          const mileageDiff = fuelLogs[fuelLogs.length - 1].mileage - fuelLogs[0].mileage;
-          if (totalLiters > 0 && mileageDiff > 0) {
-            avgEfficiency = Math.round((mileageDiff / totalLiters) * 10) / 10;
+        // Average Fuel Cost (₹/km) fleet average
+        const fuelLogs = await FuelLog.find({ vehicleId: { $in: vehicleIds } });
+        const logsByVehicle = {};
+        fuelLogs.forEach(log => {
+          const vId = log.vehicleId.toString();
+          if (!logsByVehicle[vId]) logsByVehicle[vId] = [];
+          logsByVehicle[vId].push(log);
+        });
+
+        let totalFleetCost = 0;
+        let totalFleetDistance = 0;
+        let totalFleetLiters = 0;
+
+        Object.keys(logsByVehicle).forEach(vId => {
+          const list = logsByVehicle[vId];
+          if (list.length > 1) {
+            list.sort((a, b) => Number(a.mileage) - Number(b.mileage));
+            const mileageDiff = Number(list[list.length - 1].mileage) - Number(list[0].mileage);
+            const totalCost = list.slice(1).reduce((sum, log) => sum + Number(log.cost), 0);
+            const totalLiters = list.slice(1).reduce((sum, log) => sum + Number(log.liters), 0);
+            if (mileageDiff > 0) {
+              totalFleetDistance += mileageDiff;
+              totalFleetCost += totalCost;
+              totalFleetLiters += totalLiters;
+            }
           }
+        });
+
+        let avgFuelCost = 0;
+        if (totalFleetDistance > 0) {
+          avgFuelCost = totalFleetCost / totalFleetDistance;
         }
+        const avgFuelCostStr = `₹${avgFuelCost.toFixed(2)}/km`;
+
+        let avgEfficiency = 0;
+        if (totalFleetDistance > 0 && totalFleetLiters > 0) {
+          avgEfficiency = totalFleetDistance / totalFleetLiters;
+        }
+        const avgEfficiencyStr = `${avgEfficiency.toFixed(2)} km/L`;
 
         // Recent Service Logs
         const recentRecords = await MaintenanceRecord.find({ vehicleId: { $in: vehicleIds } })
@@ -59,7 +88,7 @@ const dashboardController = {
               id: `v-dang-${vehicle._id}`,
               title: `Critical issue: ${vehicle.make} ${vehicle.model}`,
               desc: `Review active complaints or diagnostic errors immediately.`,
-              action: `/complaints`,
+              action: `/complaint-history`,
               urgency: 'danger'
             });
           }
@@ -133,7 +162,8 @@ const dashboardController = {
             totalVehicles,
             pendingServices,
             totalUpkeepCost,
-            avgEfficiency: `${avgEfficiency} km/L`
+            avgFuelCost: avgFuelCostStr,
+            avgEfficiency: avgEfficiencyStr
           },
           chartData,
           fuelChartData,

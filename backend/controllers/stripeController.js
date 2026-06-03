@@ -151,7 +151,6 @@ const stripeController = {
             { subscriptionStatus: 'premium' },
             { new: true }
           );
-          console.log(`User ${targetUserId} verified and upgraded to premium via redirect.`);
           return res.json({ success: true, status: 'premium', user: updatedUser });
         } else if (type === 'invoice' || session.mode === 'payment') {
           const targetRecordId = recordId;
@@ -162,14 +161,12 @@ const stripeController = {
               { paymentStatus: 'paid' },
               { new: true }
             );
-            console.log(`Invoice ${targetRecordId} verified and marked as paid via redirect.`);
           } else {
             updatedRecord = await MaintenanceRecord.findOneAndUpdate(
               { stripeSessionId: session.id }, 
               { paymentStatus: 'paid' },
               { new: true }
             );
-            console.log(`Invoice with session id ${session.id} verified and marked as paid via redirect.`);
           }
           return res.json({ success: true, status: 'paid', record: updatedRecord });
         }
@@ -207,20 +204,16 @@ const stripeController = {
         // If type is not in metadata, try finding by customer email or ID
         if (targetUserId) {
           await User.findByIdAndUpdate(targetUserId, { subscriptionStatus: 'premium' });
-          console.log(`User ${targetUserId} upgraded to premium.`);
         } else if (session.customer) {
           await User.findOneAndUpdate({ stripeCustomerId: session.customer }, { subscriptionStatus: 'premium' });
-          console.log(`Customer ${session.customer} upgraded to premium.`);
         }
       } else if (type === 'invoice' || session.mode === 'payment') {
         const targetRecordId = recordId;
         if (targetRecordId) {
           await MaintenanceRecord.findByIdAndUpdate(targetRecordId, { paymentStatus: 'paid' });
-          console.log(`Invoice ${targetRecordId} marked as paid.`);
         } else {
           // fallback search by stripeSessionId
           await MaintenanceRecord.findOneAndUpdate({ stripeSessionId: session.id }, { paymentStatus: 'paid' });
-          console.log(`Invoice with session id ${session.id} marked as paid.`);
         }
       }
     }

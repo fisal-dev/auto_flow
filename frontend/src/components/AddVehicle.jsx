@@ -14,6 +14,8 @@ const AddVehicle = () => {
     vin: "",
     registrationNumber: "",
   });
+  const [formErrors, setFormErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [step, setStep] = useState(1);
@@ -22,8 +24,56 @@ const AddVehicle = () => {
   const [createdId, setCreatedId] = useState("");
   const navigate = useNavigate();
 
+  const validateField = (name, value) => {
+    let errorMsg = "";
+    if (name === "make") {
+      if (!value.trim()) {
+        errorMsg = "Manufacturer is required";
+      }
+    }
+    if (name === "model") {
+      if (!value.trim()) {
+        errorMsg = "Model name is required";
+      }
+    }
+    if (name === "year") {
+      const yearNum = Number(value);
+      const currentYear = new Date().getFullYear();
+      if (!value) {
+        errorMsg = "Production year is required";
+      } else if (isNaN(yearNum) || yearNum < 1886 || yearNum > currentYear + 2) {
+        errorMsg = `Enter a valid year (1886 - ${currentYear + 2})`;
+      }
+    }
+    if (name === "vin") {
+      const cleaned = value.trim();
+      if (!cleaned) {
+        errorMsg = "VIN is required";
+      } else if (cleaned.length !== 17) {
+        errorMsg = `VIN must be exactly 17 characters (currently ${cleaned.length})`;
+      }
+    }
+    if (name === "registrationNumber") {
+      if (!value.trim()) {
+        errorMsg = "Registration number is required";
+      }
+    }
+    setFormErrors((prev) => ({ ...prev, [name]: errorMsg }));
+    return errorMsg;
+  };
+
   const handleChange = (e) => {
-    setVehicle({ ...vehicle, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setVehicle({ ...vehicle, [name]: value });
+    if (touched[name]) {
+      validateField(name, value);
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name, value);
   };
 
   const handleUpload = async (e) => {
@@ -58,11 +108,36 @@ const AddVehicle = () => {
     }
   };
 
-  const handleNext = () => setStep(step + 1);
+  const handleNext = () => {
+    // Touch all step 1 fields
+    const step1Touched = { ...touched, make: true, model: true, year: true };
+    setTouched(step1Touched);
+
+    const e1 = validateField("make", vehicle.make);
+    const e2 = validateField("model", vehicle.model);
+    const e3 = validateField("year", vehicle.year);
+
+    if (!e1 && !e2 && !e3) {
+      setStep(step + 1);
+    }
+  };
+
   const handleBack = () => setStep(step - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Touch all step 2 fields
+    const step2Touched = { ...touched, vin: true, registrationNumber: true };
+    setTouched(step2Touched);
+
+    const e4 = validateField("vin", vehicle.vin);
+    const e5 = validateField("registrationNumber", vehicle.registrationNumber);
+
+    if (e4 || e5) {
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
@@ -142,10 +217,14 @@ const AddVehicle = () => {
                         name="make"
                         value={vehicle.make}
                         onChange={handleChange}
-                        className="input-field pl-11"
+                        onBlur={handleBlur}
+                        className={`input-field pl-11 ${touched.make && formErrors.make ? "border-rose-500/50 focus:ring-rose-500/20" : ""}`}
                         placeholder="e.g. Tata"
                       />
                     </div>
+                    {touched.make && formErrors.make && (
+                      <p className="text-xs text-rose-400 font-semibold mt-1 transition-all duration-300">{formErrors.make}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Model</label>
@@ -158,10 +237,14 @@ const AddVehicle = () => {
                         name="model"
                         value={vehicle.model}
                         onChange={handleChange}
-                        className="input-field pl-11"
+                        onBlur={handleBlur}
+                        className={`input-field pl-11 ${touched.model && formErrors.model ? "border-rose-500/50 focus:ring-rose-500/20" : ""}`}
                         placeholder="e.g. Nexon"
                       />
                     </div>
+                    {touched.model && formErrors.model && (
+                      <p className="text-xs text-rose-400 font-semibold mt-1 transition-all duration-300">{formErrors.model}</p>
+                    )}
                   </div>
                 </div>
 
@@ -176,10 +259,14 @@ const AddVehicle = () => {
                       name="year"
                       value={vehicle.year}
                       onChange={handleChange}
-                      className="input-field pl-11"
+                      onBlur={handleBlur}
+                      className={`input-field pl-11 ${touched.year && formErrors.year ? "border-rose-500/50 focus:ring-rose-500/20" : ""}`}
                       placeholder="2023"
                     />
                   </div>
+                  {touched.year && formErrors.year && (
+                    <p className="text-xs text-rose-400 font-semibold mt-1 transition-all duration-300">{formErrors.year}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-8 flex justify-end">
@@ -205,11 +292,14 @@ const AddVehicle = () => {
                       name="vin"
                       value={vehicle.vin}
                       onChange={handleChange}
-                      className="input-field pl-11 uppercase font-mono"
+                      onBlur={handleBlur}
+                      className={`input-field pl-11 uppercase font-mono ${touched.vin && formErrors.vin ? "border-rose-500/50 focus:ring-rose-500/20" : ""}`}
                       placeholder="MAT543210NJ123456"
-                      required
                     />
                   </div>
+                  {touched.vin && formErrors.vin && (
+                    <p className="text-xs text-rose-400 font-semibold mt-1 transition-all duration-300">{formErrors.vin}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -223,11 +313,14 @@ const AddVehicle = () => {
                       name="registrationNumber"
                       value={vehicle.registrationNumber}
                       onChange={handleChange}
-                      className="input-field pl-11 uppercase font-mono"
+                      onBlur={handleBlur}
+                      className={`input-field pl-11 uppercase font-mono ${touched.registrationNumber && formErrors.registrationNumber ? "border-rose-500/50 focus:ring-rose-500/20" : ""}`}
                       placeholder="MH-12-AB-1234"
-                      required
                     />
                   </div>
+                  {touched.registrationNumber && formErrors.registrationNumber && (
+                    <p className="text-xs text-rose-400 font-semibold mt-1 transition-all duration-300">{formErrors.registrationNumber}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

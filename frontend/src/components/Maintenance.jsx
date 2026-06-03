@@ -30,6 +30,7 @@ const Maintenance = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const paySuccess = queryParams.get("success") === "true";
   const payCancel = queryParams.get("success") === "false";
+  const vehicleIdParam = queryParams.get("vehicleId");
 
   const loadData = async () => {
     try {
@@ -40,8 +41,14 @@ const Maintenance = () => {
       ]);
       setRecords(recordsData);
       setVehicles(vehiclesData);
-      if (vehiclesData.length > 0) {
-        setNewRecord(prev => ({ ...prev, vehicleId: vehiclesData[0]._id }));
+      
+      const defaultVehId = vehicleIdParam && vehiclesData.some(v => v._id === vehicleIdParam)
+        ? vehicleIdParam
+        : (vehiclesData[0]?._id || "");
+        
+      setNewRecord(prev => ({ ...prev, vehicleId: defaultVehId }));
+      if (vehicleIdParam && vehiclesData.some(v => v._id === vehicleIdParam)) {
+        setIsModalOpen(true);
       }
     } catch (err) {
       console.error("Error loading maintenance data:", err);
@@ -127,6 +134,9 @@ const Maintenance = () => {
            r.provider.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const canLogService = user.role === "owner" || user.role === "manager";
+
   return (
     <DashboardLayout>
       <div className="page-wrapper relative">
@@ -160,9 +170,11 @@ const Maintenance = () => {
             <h1 className="section-header">Maintenance Log</h1>
             <p className="section-subheader">Historical service records and repairs</p>
           </div>
-          <Button variant="primary" icon={Plus} onClick={() => setIsModalOpen(true)}>
-            Log Service Action
-          </Button>
+          {canLogService && (
+            <Button variant="primary" icon={Plus} onClick={() => setIsModalOpen(true)}>
+              Log Service Action
+            </Button>
+          )}
         </div>
 
         {/* Toolbar */}
